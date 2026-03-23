@@ -236,38 +236,27 @@ export function NodeGraphPanel({ controls, derived }: NodeGraphPanelProps) {
 
   return (
     <section className="node-panel panel" aria-label="Causal node graph">
-      <div className="panel-copy">
-        <p className="eyebrow">Signals</p>
-        <h2>What is acting on the forest right now?</h2>
+      <div className="panel-copy panel-copy-split">
+        <div className="panel-copy-stack">
+          <p className="eyebrow">Signals</p>
+          <h2>What is acting on the forest right now?</h2>
+        </div>
+        <button type="button" className="panel-inline-button" aria-expanded={expanded} aria-controls="forest-causal-graph-modal" onClick={() => setExpanded(true)}>
+          Graph
+        </button>
       </div>
-      <div style={{ display: "grid", gap: "0.6rem" }} aria-label="Causal graph highlights">
+      <div className="signal-grid" aria-label="Causal graph highlights">
         {highlights.map((highlight) => (
-          <article
-            key={highlight.id}
-            data-testid={`node-${highlight.id}`}
-            style={{
-              display: "grid",
-              gap: "0.28rem",
-              padding: "0.75rem 0.8rem",
-              borderRadius: "16px",
-              background: "rgba(255, 248, 236, 0.08)",
-              border: "1px solid rgba(255, 241, 223, 0.14)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "0.6rem" }}>
+          <article key={highlight.id} data-testid={`node-${highlight.id}`} className="signal-card">
+            <div className="signal-card-head">
               <span className="eyebrow" style={{ marginBottom: 0 }}>
                 {highlight.label}
               </span>
-              <strong style={{ fontSize: "1rem", letterSpacing: "-0.02em" }}>{highlight.value}</strong>
+              <strong>{highlight.value}</strong>
             </div>
-            <small style={{ color: "var(--muted)", lineHeight: 1.35 }}>{highlight.note}</small>
+            <small>{highlight.note}</small>
           </article>
         ))}
-      </div>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "0.6rem" }}>
-        <button type="button" aria-expanded={expanded} aria-controls="forest-causal-graph-modal" onClick={() => setExpanded(true)}>
-          Open causal graph
-        </button>
       </div>
       {expanded ? (
         <div

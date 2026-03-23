@@ -17,37 +17,12 @@ function buildPolyline(points: number[], min: number, max: number, width = 220, 
     .join(" ");
 }
 
-function renderTrendPreview(
-  trendKey: "living" | "temperament" | "turnover" | "disturbance",
-  points: ForestHistoryPoint[],
-  color: string,
-): JSX.Element {
-  if (trendKey === "temperament") {
-    return (
-      <>
-        {TEMPERAMENTS.map((temperament) => (
-          <polyline
-            key={temperament}
-            fill="none"
-            stroke={TEMPERAMENT_COLORS[temperament]}
-            strokeWidth="2.5"
-            points={buildPolyline(points.map((point) => point.shareByTemperament[temperament]), 0, 1, 180, 44, 4, 5)}
-          />
-        ))}
-      </>
-    );
+function formatMetric(trendKey: "living" | "temperament" | "turnover" | "disturbance", value: number): string {
+  if (trendKey === "living") {
+    return `${Math.round(value)}`;
   }
 
-  const series =
-    trendKey === "living"
-      ? points.map((point) => point.livingTreeCount)
-      : trendKey === "turnover"
-        ? points.map((point) => point.turnoverRate)
-        : points.map((point) => point.disturbanceFrequency);
-  const min = trendKey === "living" ? Math.min(...series, 0) : 0;
-  const max = trendKey === "living" ? Math.max(...series, 1) : 1;
-
-  return <polyline fill="none" stroke={color} strokeWidth="2.5" points={buildPolyline(series, min, max, 180, 44, 4, 5)} />;
+  return `${Math.round(value * 100)}%`;
 }
 
 export function ChartsPanel({ history }: ChartsPanelProps) {
@@ -59,6 +34,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
   const trendMap = {
     living: {
       title: "Living tree count",
+      shortLabel: "Living trees",
       subtitle: "Population trend",
       description: "The clearest single signal for stand trajectory.",
       color: "#f2a33a",
@@ -70,6 +46,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
     },
     temperament: {
       title: "Share by temperament",
+      shortLabel: "Temperaments",
       subtitle: "Living-tree share",
       description: "The composition split behind the count.",
       color: "#97d8bf",
@@ -81,6 +58,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
     },
     turnover: {
       title: "Turnover rate",
+      shortLabel: "Turnover",
       subtitle: "Deaths plus recruits",
       description: "Replacement pressure over the recent window.",
       color: "#d8f2d9",
@@ -92,6 +70,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
     },
     disturbance: {
       title: "Disturbance frequency",
+      shortLabel: "Disturbance",
       subtitle: "Recent fire and gap activity",
       description: "How often the stand is being jolted.",
       color: "#97d8bf",
@@ -104,6 +83,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
   } as const;
   const active = trendMap[activeTrend];
   const selectorOrder = Object.keys(trendMap) as Array<keyof typeof trendMap>;
+  const activeLatest = active.points.at(-1) ?? 0;
 
   return (
     <section className="charts-panel panel" aria-label="Trend charts">
@@ -111,36 +91,16 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
         <p className="eyebrow">Trends</p>
         <h2>How the stand has been moving over time.</h2>
       </div>
-      <div style={{ display: "grid", gap: "0.7rem" }}>
-        <article
-          className="chart-card"
-          style={{
-            minWidth: 0,
-            padding: "0.8rem",
-            background: "rgba(255, 248, 236, 0.08)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "baseline", marginBottom: "0.45rem" }}>
+      <div className="charts-panel-body">
+        <article className="chart-card chart-card-primary">
+          <div className="chart-card-head">
             <div className="chart-copy">
               <strong>{active.title}</strong>
               <span>{active.subtitle}</span>
             </div>
-            <span
-              style={{
-                flex: "0 0 auto",
-                padding: "0.24rem 0.55rem",
-                borderRadius: "999px",
-                background: "rgba(255, 208, 134, 0.16)",
-                color: "var(--accent-strong)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              Primary
-            </span>
+            <strong className="chart-value-pill">{formatMetric(activeTrend, activeLatest)}</strong>
           </div>
-          <svg viewBox="0 0 320 104" role="img" aria-label={active.ariaLabel} style={{ width: "100%", height: "auto" }}>
+          <svg viewBox="0 0 320 88" role="img" aria-label={active.ariaLabel} className="chart-primary-svg">
             {activeTrend === "temperament" ? (
               TEMPERAMENTS.map((temperament) => (
                 <polyline
@@ -148,17 +108,16 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
                   fill="none"
                   stroke={TEMPERAMENT_COLORS[temperament]}
                   strokeWidth="2.5"
-                  points={buildPolyline(points.map((point) => point.shareByTemperament[temperament]), 0, 1, 320, 104, 8, 10)}
+                  points={buildPolyline(points.map((point) => point.shareByTemperament[temperament]), 0, 1, 320, 88, 8, 10)}
                 />
               ))
             ) : (
-              <polyline fill="none" stroke={active.color} strokeWidth="3" points={buildPolyline(active.points, active.min, active.max, 320, 104, 8, 10)} />
+              <polyline fill="none" stroke={active.color} strokeWidth="3" points={buildPolyline(active.points, active.min, active.max, 320, 88, 8, 10)} />
             )}
-            <path d="M0 92 H320" className="chart-axis" />
+            <path d="M0 76 H320" className="chart-axis" />
           </svg>
-          <div style={{ display: "grid", gap: "0.5rem", marginTop: "0.35rem" }}>
-            <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.35 }}>{active.description}</p>
-            {active.hasLegend ? (
+          {active.hasLegend ? (
+            <div className="chart-meta">
               <div className="chart-legend">
                 {TEMPERAMENTS.map((temperament) => (
                   <span key={temperament}>
@@ -167,17 +126,10 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
                   </span>
                 ))}
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </article>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.45rem",
-            alignItems: "stretch",
-          }}
-        >
+        <div className="trend-toggle-grid">
           {selectorOrder.map((trendKey) => {
             const trend = trendMap[trendKey];
             const isActive = activeTrend === trendKey;
@@ -187,27 +139,12 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
                 type="button"
                 onClick={() => setActiveTrend(trendKey)}
                 aria-pressed={isActive}
-                style={{
-                  flex: "1 1 150px",
-                  minWidth: 0,
-                  textAlign: "left",
-                  padding: "0.55rem 0.65rem",
-                  borderRadius: "16px",
-                  background: isActive ? "rgba(255, 249, 239, 0.14)" : "rgba(255, 248, 236, 0.06)",
-                  border: isActive ? "1px solid rgba(255, 213, 146, 0.42)" : "1px solid rgba(255, 241, 223, 0.14)",
-                  color: "inherit",
-                  display: "grid",
-                  gap: "0.4rem",
-                }}
+                className={isActive ? "trend-toggle trend-toggle-active" : "trend-toggle"}
               >
-                <div className="chart-copy" style={{ gap: "0.18rem" }}>
-                  <strong>{trend.title}</strong>
-                  <span>{trend.subtitle}</span>
+                <div className="chart-copy trend-toggle-copy">
+                  <strong>{trend.shortLabel}</strong>
                 </div>
-                <svg viewBox="0 0 180 40" aria-hidden="true" focusable="false" style={{ width: "100%", height: "auto" }}>
-                  <path d="M0 34 H180" className="chart-axis" />
-                  {renderTrendPreview(trendKey, points, trend.color)}
-                </svg>
+                <strong className="trend-toggle-value">{formatMetric(trendKey, trend.points.at(-1) ?? 0)}</strong>
               </button>
             );
           })}

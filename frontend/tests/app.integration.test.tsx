@@ -3,7 +3,51 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { App } from "../src/App";
 import { TreemapPanel } from "../src/prototype/TreemapPanel";
-import { TEMPERAMENT_COLORS } from "../src/prototype/types";
+import { TEMPERAMENT_COLORS, TEMPERAMENTS } from "../src/prototype/types";
+import type { ForestTree, SizeClass, Temperament } from "../src/prototype/types";
+
+const SIZE_CLASS_ORDER: SizeClass[] = ["large_canopy", "canopy_candidate", "juvenile", "seedling"];
+
+const SIZE_CLASS_SIZES: Record<SizeClass, number> = {
+  large_canopy: 0.82,
+  canopy_candidate: 0.58,
+  juvenile: 0.32,
+  seedling: 0.14,
+};
+
+function buildTreemapTrees(
+  counts: Record<Temperament, Partial<Record<SizeClass, number>>>,
+): ForestTree[] {
+  let nextId = 1;
+  const trees: ForestTree[] = [];
+
+  for (const temperament of TEMPERAMENTS) {
+    for (const sizeClass of SIZE_CLASS_ORDER) {
+      const total = counts[temperament]?.[sizeClass] ?? 0;
+      for (let index = 0; index < total; index += 1) {
+        trees.push({
+          id: nextId,
+          temperament,
+          age: 20,
+          alive: true,
+          x: 0.1,
+          y: 0.1,
+          size: SIZE_CLASS_SIZES[sizeClass],
+          sizeClass,
+          canopyRole: sizeClass === "large_canopy" ? "canopy" : sizeClass === "canopy_candidate" ? "subcanopy" : "suppressed",
+          vigor: 0.7,
+          suppressionLevel: 0.1,
+          reproductiveState: "active",
+          disturbanceDamage: 0,
+          suppressionYears: 0,
+        });
+        nextId += 1;
+      }
+    }
+  }
+
+  return trees;
+}
 
 describe("Forest systems prototype app", () => {
   it("renders the prototype dashboard with controls and required graph nodes", async () => {
@@ -97,19 +141,66 @@ describe("Forest systems prototype app", () => {
   it("keeps temperament colors tied to temperament identity even when shares reorder", () => {
     render(
       <TreemapPanel
-        livingTreeCount={100}
-        shareByTemperament={{
-          large_gambler: 0.12,
-          small_gambler: 0.41,
-          large_struggler: 0.33,
-          small_struggler: 0.14,
-        }}
+        trees={buildTreemapTrees({
+          large_gambler: { large_canopy: 4, juvenile: 8 },
+          small_gambler: { large_canopy: 16, canopy_candidate: 12, juvenile: 9, seedling: 4 },
+          large_struggler: { large_canopy: 11, canopy_candidate: 12, juvenile: 7, seedling: 3 },
+          small_struggler: { large_canopy: 4, canopy_candidate: 5, juvenile: 3, seedling: 2 },
+        })}
       />,
     );
 
-    expect(screen.getByTestId("treemap-large_gambler")).toHaveStyle(`background: linear-gradient(160deg, ${TEMPERAMENT_COLORS.large_gambler}, rgba(5, 9, 8, 0.28))`);
-    expect(screen.getByTestId("treemap-small_gambler")).toHaveStyle(`background: linear-gradient(160deg, ${TEMPERAMENT_COLORS.small_gambler}, rgba(5, 9, 8, 0.28))`);
-    expect(screen.getByTestId("treemap-large_struggler")).toHaveStyle(`background: linear-gradient(160deg, ${TEMPERAMENT_COLORS.large_struggler}, rgba(5, 9, 8, 0.28))`);
-    expect(screen.getByTestId("treemap-small_struggler")).toHaveStyle(`background: linear-gradient(160deg, ${TEMPERAMENT_COLORS.small_struggler}, rgba(5, 9, 8, 0.28))`);
+    expect(screen.getByTestId("treemap-large_gambler")).toHaveStyle(`background: linear-gradient(165deg, ${TEMPERAMENT_COLORS.large_gambler}, rgba(5, 9, 8, 0.42))`);
+    expect(screen.getByTestId("treemap-small_gambler")).toHaveStyle(`background: linear-gradient(165deg, ${TEMPERAMENT_COLORS.small_gambler}, rgba(5, 9, 8, 0.42))`);
+    expect(screen.getByTestId("treemap-large_struggler")).toHaveStyle(`background: linear-gradient(165deg, ${TEMPERAMENT_COLORS.large_struggler}, rgba(5, 9, 8, 0.42))`);
+    expect(screen.getByTestId("treemap-small_struggler")).toHaveStyle(`background: linear-gradient(165deg, ${TEMPERAMENT_COLORS.small_struggler}, rgba(5, 9, 8, 0.42))`);
+  });
+
+  it("keeps each temperament anchored to a stable side of the treemap", () => {
+    const { rerender } = render(
+      <TreemapPanel
+        trees={buildTreemapTrees({
+          large_gambler: { large_canopy: 24, canopy_candidate: 14, juvenile: 6, seedling: 2 },
+          small_gambler: { large_canopy: 5, juvenile: 3 },
+          large_struggler: { large_canopy: 16, canopy_candidate: 10, juvenile: 3, seedling: 1 },
+          small_struggler: { large_canopy: 8, canopy_candidate: 5, juvenile: 2, seedling: 1 },
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("treemap-large_gambler")).toHaveStyle({ left: "0%", top: "0%" });
+    expect(screen.getByTestId("treemap-cell-large_gambler-large_canopy")).toBeInTheDocument();
+
+    rerender(
+      <TreemapPanel
+        trees={buildTreemapTrees({
+          large_gambler: { large_canopy: 20, canopy_candidate: 12, juvenile: 6, seedling: 2 },
+          small_gambler: { large_canopy: 18, canopy_candidate: 10, juvenile: 8, seedling: 5 },
+          large_struggler: { large_canopy: 17, canopy_candidate: 10, juvenile: 4, seedling: 1 },
+          small_struggler: { large_canopy: 11, canopy_candidate: 7, juvenile: 3, seedling: 1 },
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("treemap-large_gambler")).toHaveStyle({ left: "0%", top: "0%" });
+    expect(screen.getByTestId("treemap-cell-small_gambler-large_canopy")).toBeInTheDocument();
+  });
+
+  it("renders nested size-class tiles inside each temperament block", () => {
+    render(
+      <TreemapPanel
+        trees={buildTreemapTrees({
+          large_gambler: { large_canopy: 9, canopy_candidate: 5, juvenile: 3, seedling: 1 },
+          small_gambler: { large_canopy: 7, canopy_candidate: 6, juvenile: 4, seedling: 2 },
+          large_struggler: { large_canopy: 8, canopy_candidate: 5, juvenile: 4, seedling: 3 },
+          small_struggler: { large_canopy: 6, canopy_candidate: 4, juvenile: 3, seedling: 2 },
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("treemap-cell-large_gambler-large_canopy")).toBeInTheDocument();
+    expect(screen.getByTestId("treemap-cell-small_gambler-canopy_candidate")).toBeInTheDocument();
+    expect(screen.getByTestId("treemap-cell-large_struggler-juvenile")).toBeInTheDocument();
+    expect(screen.getByTestId("treemap-cell-small_struggler-seedling")).toBeInTheDocument();
   });
 });

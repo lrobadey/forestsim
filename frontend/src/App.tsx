@@ -67,7 +67,7 @@ export function App() {
 
       <main className="dashboard-body">
         <ControlsPanel controls={model.state.controls} onChange={model.setControl} />
-        <TreemapPanel livingTreeCount={model.state.derived.livingTreeCount} shareByTemperament={model.state.derived.shareByTemperament} />
+        <TreemapPanel trees={model.state.trees} />
         <div className="dashboard-rail">
           <NodeGraphPanel controls={model.state.controls} derived={model.state.derived} />
           <ChartsPanel history={model.state.history} />

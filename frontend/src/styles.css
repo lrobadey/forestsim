@@ -233,6 +233,7 @@ select {
 .control-grid {
   display: grid;
   gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .control-card {
@@ -255,6 +256,44 @@ select {
   font-size: 0.95rem;
 }
 
+.control-card-compact {
+  gap: 0.55rem;
+  min-height: 0;
+  padding: 0.72rem 0.78rem;
+  background: rgba(255, 248, 236, 0.06);
+}
+
+.control-head-compact {
+  align-items: flex-start;
+}
+
+.control-copy-compact {
+  min-width: 0;
+}
+
+.control-copy-compact strong {
+  display: block;
+  line-height: 1.1;
+}
+
+.control-copy-compact p {
+  margin: 0.18rem 0 0;
+  line-height: 1.35;
+}
+
+.control-value-pill {
+  flex: 0 0 auto;
+  padding: 0.28rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(255, 208, 134, 0.16);
+  color: var(--accent-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.control-slider {
+  align-self: end;
+}
+
 .control-head p,
 .control-card small {
   margin: 0;
@@ -271,24 +310,140 @@ select {
 
 .treemap-block {
   position: absolute;
-  display: grid;
-  align-content: end;
-  gap: 0.2rem;
-  padding: 0.75rem;
   border: 1px solid rgba(255, 247, 234, 0.2);
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 252, 244, 0.1);
+  transition:
+    left 220ms ease-out,
+    top 220ms ease-out,
+    width 220ms ease-out,
+    height 220ms ease-out;
+}
+
+.treemap-block-inner {
+  position: absolute;
+  inset: 0.32rem;
+  border-radius: 14px;
   overflow: hidden;
 }
 
-.treemap-block span,
-.treemap-block small {
+.treemap-block-copy {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 2;
+  display: grid;
+  gap: 0.08rem;
+  padding: 0.38rem 0.46rem 0.34rem;
+  border-radius: 12px;
+  background: rgba(16, 14, 12, 0.34);
+  border: 1px solid rgba(255, 247, 234, 0.16);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.treemap-block-copy span,
+.treemap-cell span {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.7rem;
 }
 
-.treemap-block strong {
+.treemap-summary-pill {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex: 1 1 140px;
+  min-width: 0;
+  padding: 0.46rem 0.68rem;
+  border-radius: 16px;
+  background: rgba(255, 248, 236, 0.08);
+  border: 1px solid rgba(255, 241, 223, 0.14);
+}
+
+.panel-copy-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.panel-copy-stack {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.panel-inline-button {
+  align-self: flex-start;
+  flex: 0 0 auto;
+}
+
+.signal-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.signal-card {
+  display: grid;
+  gap: 0.24rem;
+  padding: 0.56rem 0.66rem;
+  border-radius: 16px;
+  background: rgba(255, 248, 236, 0.08);
+  border: 1px solid rgba(255, 241, 223, 0.14);
+}
+
+.signal-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.signal-card-head strong {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.signal-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.signal-card:last-child {
+  grid-column: 1 / -1;
+}
+
+.treemap-block-copy strong,
+.treemap-cell strong {
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
   font-size: 1.05rem;
+}
+
+.treemap-cell {
+  position: absolute;
+  display: grid;
+  align-content: end;
+  gap: 0.16rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(255, 247, 234, 0.22);
+  overflow: hidden;
+  transition:
+    left 220ms ease-out,
+    top 220ms ease-out,
+    width 220ms ease-out,
+    height 220ms ease-out;
+}
+
+.treemap-cell span,
+.treemap-cell strong {
+  position: relative;
+  z-index: 1;
 }
 
 .node-graph {
@@ -324,6 +479,90 @@ select {
 
 .chart-copy strong {
   font-size: 0.95rem;
+}
+
+.charts-panel-body {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.chart-card-primary {
+  min-width: 0;
+  padding: 0.72rem;
+  background: rgba(255, 248, 236, 0.08);
+}
+
+.chart-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.chart-value-pill {
+  flex: 0 0 auto;
+  padding: 0.22rem 0.52rem;
+  border-radius: 999px;
+  background: rgba(255, 208, 134, 0.16);
+  color: var(--accent-strong);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chart-primary-svg {
+  width: 100%;
+  height: auto;
+}
+
+.chart-meta {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.chart-meta p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.trend-toggle-grid {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trend-toggle {
+  min-width: 0;
+  text-align: left;
+  padding: 0.48rem 0.56rem;
+  border-radius: 16px;
+  background: rgba(255, 248, 236, 0.06);
+  border: 1px solid rgba(255, 241, 223, 0.14);
+  color: inherit;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.trend-toggle-active {
+  background: rgba(255, 249, 239, 0.14);
+  border-color: rgba(255, 213, 146, 0.42);
+}
+
+.trend-toggle-copy {
+  gap: 0.14rem;
+}
+
+.trend-toggle-copy strong {
+  font-size: 0.9rem;
+}
+
+.trend-toggle-value {
+  font-size: 0.8rem;
+  color: var(--accent-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 .chart-axis {
@@ -434,7 +673,7 @@ select {
   }
 
   .dashboard-rail {
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 0.85fr) minmax(0, 1.15fr);
     min-height: 0;
   }
 
@@ -452,6 +691,13 @@ select {
     font-size: 1.14rem;
   }
 
+  .panel-copy p:last-child,
+  .signal-card small,
+  .chart-meta p,
+  .control-copy-compact p {
+    font-size: 0.9rem;
+  }
+
   .controls-panel {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -466,25 +712,61 @@ select {
     padding: 0.72rem 0.75rem;
   }
 
+  .signal-grid {
+    gap: 0.48rem;
+  }
+
   .treemap-stage {
     min-height: 0;
     height: 100%;
   }
 
-  .treemap-block {
-    padding: 0.65rem;
+  .treemap-summary {
+    gap: 0.45rem;
+    margin-bottom: 0.55rem !important;
   }
 
-  .treemap-block strong {
-    font-size: 1rem;
+  .treemap-block-copy {
+    top: 0.35rem;
+    left: 0.35rem;
+    padding: 0.32rem 0.4rem 0.28rem;
+  }
+
+  .treemap-block-copy span,
+  .treemap-cell span {
+    font-size: 0.62rem;
+  }
+
+  .treemap-block-copy strong,
+  .treemap-cell strong {
+    font-size: 0.96rem;
+  }
+
+  .treemap-cell {
+    padding: 0.45rem;
   }
 
   .node-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     align-content: start;
   }
 
   .chart-card {
     min-height: 0;
+  }
+
+  .charts-panel-body {
+    gap: 0.55rem;
+  }
+
+  .charts-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .trend-toggle-grid {
+    gap: 0.38rem;
   }
 
   .node-graph {
@@ -516,6 +798,18 @@ select {
 
   .playback-group button {
     flex: 1 1 0;
+  }
+
+  .trend-toggle-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .signal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .signal-card:last-child {
+    grid-column: auto;
   }
 
   .treemap-stage {
