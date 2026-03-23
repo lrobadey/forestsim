@@ -1,0 +1,21 @@
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Frontend
+node_modules/
+dist/
+build/
+
+# Local env files
+.env
+.env.*
+
+# Tooling
+.claude/

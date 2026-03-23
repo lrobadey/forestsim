@@ -1,0 +1,81 @@
+{
+  "mode": "neutral",
+  "sample": {
+    "accepted": false,
+    "family_passes": {
+      "age": false,
+      "biomass": false,
+      "composition": false,
+      "gap": false,
+      "spatial": false
+    },
+    "metric_errors": {
+      "age_distribution": 0.003762754896544554,
+      "dominant_pft_patch_p50_cells": 0.0,
+      "dominant_pft_patch_p90_cells": 0.2,
+      "gap_fraction": 0.002721959811063911,
+      "gap_size_p50_ha": 0.0027219598110638796,
+      "gap_size_p90_ha": 0.0027219598110638796,
+      "mean_canopy_height_m": 0.0005871910409359447,
+      "morans_i_height": 0.05156292044745836,
+      "pft_biomass_fraction": 0.5442123538411141,
+      "total_biomass_kg_ha": 0.1907965059794367
+    },
+    "metric_passes": {
+      "age_distribution": false,
+      "dominant_pft_patch_p50_cells": true,
+      "dominant_pft_patch_p90_cells": false,
+      "gap_fraction": false,
+      "gap_size_p50_ha": false,
+      "gap_size_p90_ha": false,
+      "mean_canopy_height_m": false,
+      "morans_i_height": false,
+      "pft_biomass_fraction": false,
+      "total_biomass_kg_ha": false
+    },
+    "parameters": {
+      "globals.mortality_stress_scalar": 1.0,
+      "globals.recruitment_base_scalar": 1.0,
+      "species.pioneer_conifer.g_max_cm_yr": 1.05,
+      "species.shade_tolerant_hardwood.background_mortality_yr": 0.009
+    },
+    "sample_index": -1,
+    "simulated": {
+      "age_distribution": [
+        0.9803716086461541,
+        0.004477790012773998,
+        0.012705546750657097,
+        0.0024450545904146775,
+        0.0
+      ],
+      "biomass_trajectory_shape": [
+        0.11392784234117609,
+        0.13031367874930183,
+        0.22799399812666887,
+        0.3808630330162412,
+        0.5189929609403631,
+        0.6491619721768594,
+        0.8171085302910921,
+        1.0
+      ],
+      "dominant_pft_patch_p50_cells": 1.0,
+      "dominant_pft_patch_p90_cells": 4.0,
+      "gap_fraction": 0.99656,
+      "gap_size_p50_ha": 498.28000000000003,
+      "gap_size_p90_ha": 498.28000000000003,
+      "mean_canopy_height_m": 0.20609261095523834,
+      "mean_gap_size_ha": 498.28000000000003,
+      "morans_i_height": 0.012726422824633219,
+      "pft_biomass_fraction": {
+        "pioneer_conifer": 0.2000062203559708,
+        "pioneer_hardwood": 0.1998985431545936,
+        "shade_intolerant_hardwood": 0.20048297653752828,
+        "shade_tolerant_hardwood": 0.2073949695306255,
+        "subcanopy_specialist": 0.19221729042128194
+      },
+      "species_richness": 5.0,
+      "total_biomass_kg_ha": 1036049.1241728924
+    },
+    "total_distance": 0.9990876056386814
+  }
+}

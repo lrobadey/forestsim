@@ -1,0 +1,156 @@
+{
+  "type": "FeatureCollection",
+  "name": "ssurgo",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::32618"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "awc": 124.0,
+        "depth_to_restriction": 155.0,
+        "texture_class": "loam",
+        "rock_fraction": 0.1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              500000.0,
+              4501000.0
+            ],
+            [
+              501250.0,
+              4501000.0
+            ],
+            [
+              501250.0,
+              4502000.0
+            ],
+            [
+              500000.0,
+              4502000.0
+            ],
+            [
+              500000.0,
+              4501000.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "awc": 98.0,
+        "depth_to_restriction": 120.0,
+        "texture_class": "silt_loam",
+        "rock_fraction": 0.14
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              501250.0,
+              4501000.0
+            ],
+            [
+              502500.0,
+              4501000.0
+            ],
+            [
+              502500.0,
+              4502000.0
+            ],
+            [
+              501250.0,
+              4502000.0
+            ],
+            [
+              501250.0,
+              4501000.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "awc": 72.0,
+        "depth_to_restriction": 55.0,
+        "texture_class": "sand",
+        "rock_fraction": 0.3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              500000.0,
+              4500000.0
+            ],
+            [
+              501250.0,
+              4500000.0
+            ],
+            [
+              501250.0,
+              4501000.0
+            ],
+            [
+              500000.0,
+              4501000.0
+            ],
+            [
+              500000.0,
+              4500000.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "awc": 86.0,
+        "depth_to_restriction": 85.0,
+        "texture_class": "clay_loam",
+        "rock_fraction": 0.22
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              501250.0,
+              4500000.0
+            ],
+            [
+              502500.0,
+              4500000.0
+            ],
+            [
+              502500.0,
+              4501000.0
+            ],
+            [
+              501250.0,
+              4501000.0
+            ],
+            [
+              501250.0,
+              4500000.0
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

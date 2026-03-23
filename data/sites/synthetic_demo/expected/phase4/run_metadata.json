@@ -1,0 +1,9 @@
+{
+  "calibration_spec_path": "/Users/lucarobadey/Desktop/Projects/Coding/Forest Sim/data/sites/synthetic_demo/calibration_spec.json",
+  "end_year": 2025,
+  "manifest_path": "/Users/lucarobadey/Desktop/Projects/Coding/Forest Sim/data/sites/synthetic_demo/site_manifest.json",
+  "n_accepted_runs": 1,
+  "n_samples": 1,
+  "site_id": "synthetic_demo",
+  "start_year": 2015
+}

@@ -1,0 +1,5 @@
+first_order,parameter,total_order
+0.0,globals.mortality_stress_scalar,0.0
+0.0,globals.recruitment_base_scalar,0.0
+0.0,species.pioneer_conifer.g_max_cm_yr,0.0
+0.0,species.shade_tolerant_hardwood.background_mortality_yr,0.0

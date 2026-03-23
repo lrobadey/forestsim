@@ -1,0 +1,58 @@
+{
+  "site_id": "synthetic_demo",
+  "epsg": 32618,
+  "origin_utm": [
+    500000.0,
+    4500000.0
+  ],
+  "extent_m": [
+    2500.0,
+    2000.0
+  ],
+  "cell_size_m": 20.0,
+  "start_year": 2015,
+  "dem_path": "dem.tif",
+  "ssurgo_path": "ssurgo.geojson",
+  "climate": {
+    "baseline": {
+      "gdd_path": "climate/baseline/gdd.tif",
+      "precip_path": "climate/baseline/precip.tif",
+      "drought_path": "climate/baseline/drought.tif",
+      "frost_free_path": "climate/baseline/frost_free.tif"
+    },
+    "yearly_overrides": {
+      "2021": {
+        "gdd_path": "climate/yearly_overrides/2021/gdd.tif",
+        "precip_path": "climate/yearly_overrides/2021/precip.tif",
+        "drought_path": "climate/yearly_overrides/2021/drought.tif",
+        "frost_free_path": "climate/yearly_overrides/2021/frost_free.tif"
+      },
+      "2024": {
+        "gdd_path": "climate/yearly_overrides/2024/gdd.tif",
+        "precip_path": "climate/yearly_overrides/2024/precip.tif",
+        "drought_path": "climate/yearly_overrides/2024/drought.tif",
+        "frost_free_path": "climate/yearly_overrides/2024/frost_free.tif"
+      }
+    }
+  },
+  "fia": {
+    "plots_path": "fia/plots.csv",
+    "trees_path": "fia/trees.csv",
+    "conditions_path": "fia/conditions.csv",
+    "crosswalk_path": "fia/crosswalk.csv"
+  },
+  "mtbs_path": "mtbs.geojson",
+  "landfire": {
+    "evt": "landfire/evt.tif",
+    "bps": "landfire/bps.tif",
+    "fuel_model": "landfire/fuel_model.tif"
+  },
+  "validation": {
+    "baseline_end_year": 2025,
+    "targets_path": "site_targets.json"
+  },
+  "calibration": {
+    "spec_path": "calibration_spec.json",
+    "end_year": 2025
+  }
+}

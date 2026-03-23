@@ -1,0 +1,21 @@
+{
+  "gap_fraction": 0.99928,
+  "mean_canopy_height_m": 0.20621369779109955,
+  "morans_i_height": 0.012102388337559396,
+  "pft_biomass_fraction": {
+    "pioneer_conifer": 0.2590583538378769,
+    "pioneer_hardwood": 0.3342722028835549,
+    "shade_intolerant_hardwood": 0.27916336024721783,
+    "shade_tolerant_hardwood": 0.07794645480074582,
+    "subcanopy_specialist": 0.04955962823060441
+  },
+  "pft_biomass_kg": {
+    "pioneer_conifer": 9015.71945351467,
+    "pioneer_hardwood": 11633.30329888723,
+    "shade_intolerant_hardwood": 9715.411606701007,
+    "shade_tolerant_hardwood": 2712.683680987854,
+    "subcanopy_specialist": 1724.7685617088412
+  },
+  "total_biomass_kg": 34801.886601799735,
+  "total_biomass_kg_ha": 870047.1650449934
+}

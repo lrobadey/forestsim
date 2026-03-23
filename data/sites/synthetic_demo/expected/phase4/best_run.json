@@ -1,0 +1,78 @@
+{
+  "accepted": true,
+  "family_passes": {
+    "age": true,
+    "biomass": true,
+    "composition": true,
+    "gap": true,
+    "spatial": true
+  },
+  "metric_errors": {
+    "age_distribution": 0.0,
+    "dominant_pft_patch_p50_cells": 0.0,
+    "dominant_pft_patch_p90_cells": 0.0,
+    "gap_fraction": 0.0,
+    "gap_size_p50_ha": 0.0,
+    "gap_size_p90_ha": 0.0,
+    "mean_canopy_height_m": 0.0,
+    "morans_i_height": 0.0,
+    "pft_biomass_fraction": 0.0,
+    "total_biomass_kg_ha": 0.0
+  },
+  "metric_passes": {
+    "age_distribution": true,
+    "dominant_pft_patch_p50_cells": true,
+    "dominant_pft_patch_p90_cells": true,
+    "gap_fraction": true,
+    "gap_size_p50_ha": true,
+    "gap_size_p90_ha": true,
+    "mean_canopy_height_m": true,
+    "morans_i_height": true,
+    "pft_biomass_fraction": true,
+    "total_biomass_kg_ha": true
+  },
+  "parameters": {
+    "globals.mortality_stress_scalar": 1.0,
+    "globals.recruitment_base_scalar": 1.0,
+    "species.pioneer_conifer.g_max_cm_yr": 1.05,
+    "species.shade_tolerant_hardwood.background_mortality_yr": 0.009
+  },
+  "sample_index": 0,
+  "simulated": {
+    "age_distribution": [
+      0.971026697684164,
+      0.01174354840203748,
+      0.014846675602755004,
+      0.0023830783110433762,
+      0.0
+    ],
+    "biomass_trajectory_shape": [
+      0.1353820791868615,
+      0.1418631748556609,
+      0.233551095225142,
+      0.3746054099248996,
+      0.5097076206342797,
+      0.6414151365034811,
+      0.8134000199892835,
+      1.0
+    ],
+    "dominant_pft_patch_p50_cells": 1.0,
+    "dominant_pft_patch_p90_cells": 5.0,
+    "gap_fraction": 0.99928,
+    "gap_size_p50_ha": 499.64,
+    "gap_size_p90_ha": 499.64,
+    "mean_canopy_height_m": 0.20621369779109955,
+    "mean_gap_size_ha": 499.64,
+    "morans_i_height": 0.012102388337559396,
+    "pft_biomass_fraction": {
+      "pioneer_conifer": 0.2590583538378769,
+      "pioneer_hardwood": 0.3342722028835549,
+      "shade_intolerant_hardwood": 0.27916336024721783,
+      "shade_tolerant_hardwood": 0.07794645480074582,
+      "subcanopy_specialist": 0.04955962823060441
+    },
+    "species_richness": 5.0,
+    "total_biomass_kg_ha": 870047.1650449934
+  },
+  "total_distance": 0.0
+}

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "watt-forest-engine"
+version = "0.1.0"
+description = "Deterministic, event-sourced forest landscape simulator."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "SALib>=1.4",
+  "fiona>=1.9",
+  "geopandas>=0.14",
+  "fastapi>=0.110",
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pyproj>=3.5",
+  "pysheds>=0.3",
+  "rasterio>=1.3",
+  "shapely>=2.0",
+  "scipy>=1.10",
+  "uvicorn>=0.30",
+]
+
+[project.scripts]
+wattforest-phase3 = "wattforest.phase3:main"
+wattforest-phase4 = "wattforest.phase4:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

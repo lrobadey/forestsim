@@ -1,0 +1,9 @@
+accepted,parameter,passing_family_count,quantile,total_distance,value
+True,globals.mortality_stress_scalar,5,0.25,0.0,1.0
+True,globals.mortality_stress_scalar,5,0.75,0.0,1.0
+True,globals.recruitment_base_scalar,5,0.25,0.0,1.0
+True,globals.recruitment_base_scalar,5,0.75,0.0,1.0
+True,species.pioneer_conifer.g_max_cm_yr,5,0.25,0.0,1.05
+True,species.pioneer_conifer.g_max_cm_yr,5,0.75,0.0,1.05
+True,species.shade_tolerant_hardwood.background_mortality_yr,5,0.25,0.0,0.009
+True,species.shade_tolerant_hardwood.background_mortality_yr,5,0.75,0.0,0.009

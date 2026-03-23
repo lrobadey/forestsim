@@ -1,0 +1,118 @@
+{
+  "age_bins": [
+    0,
+    20,
+    40,
+    80,
+    120,
+    999
+  ],
+  "gap_threshold": 0.3,
+  "metric_targets": [
+    {
+      "family": "biomass",
+      "metric": "total_biomass_kg_ha",
+      "observed": 870047.1650449934,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "biomass",
+      "metric": "mean_canopy_height_m",
+      "observed": 0.20621369779109955,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "gap",
+      "metric": "gap_fraction",
+      "observed": 0.99928,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "gap",
+      "metric": "gap_size_p50_ha",
+      "observed": 499.64,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "gap",
+      "metric": "gap_size_p90_ha",
+      "observed": 499.64,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "spatial",
+      "metric": "dominant_pft_patch_p50_cells",
+      "observed": 1.0,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "spatial",
+      "metric": "dominant_pft_patch_p90_cells",
+      "observed": 5.0,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "spatial",
+      "metric": "morans_i_height",
+      "observed": 0.012102388337559396,
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "composition",
+      "metric": "pft_biomass_fraction",
+      "observed": {
+        "pioneer_conifer": 0.2590583538378769,
+        "pioneer_hardwood": 0.3342722028835549,
+        "shade_intolerant_hardwood": 0.27916336024721783,
+        "shade_tolerant_hardwood": 0.07794645480074582,
+        "subcanopy_specialist": 0.04955962823060441
+      },
+      "tolerance": 1e-09,
+      "weight": 1.0
+    },
+    {
+      "family": "age",
+      "metric": "age_distribution",
+      "observed": [
+        0.971026697684164,
+        0.01174354840203748,
+        0.014846675602755004,
+        0.0023830783110433762,
+        0.0
+      ],
+      "tolerance": 1e-09,
+      "weight": 1.0
+    }
+  ],
+  "min_pattern_families": 3,
+  "parameter_space": {
+    "globals.mortality_stress_scalar": {
+      "max": 1.0,
+      "min": 1.0,
+      "scale": "linear"
+    },
+    "globals.recruitment_base_scalar": {
+      "max": 1.0,
+      "min": 1.0,
+      "scale": "linear"
+    },
+    "species.pioneer_conifer.g_max_cm_yr": {
+      "max": 1.05,
+      "min": 1.05,
+      "scale": "linear"
+    },
+    "species.shade_tolerant_hardwood.background_mortality_yr": {
+      "max": 0.009,
+      "min": 0.009,
+      "scale": "linear"
+    }
+  }
+}
