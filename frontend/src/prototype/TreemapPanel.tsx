@@ -64,29 +64,43 @@ export function TreemapPanel({ livingTreeCount, shareByTemperament }: TreemapPan
   }));
   const rectangles = buildTreemap(entries, 0, 0, 100, 100, true);
   const [dominant, runnerUp] = [...entries].sort((left, right) => right.value - left.value);
+  const dominantShare = Math.round(dominant.value * 100);
+  const runnerUpShare = Math.round(runnerUp.value * 100);
 
   return (
-    <section className="treemap-panel panel" aria-label="Composition treemap">
-      <div className="panel-copy">
+    <section
+      className="treemap-panel panel"
+      aria-label="Composition treemap"
+      style={{
+        display: "grid",
+        gridTemplateRows: "auto auto minmax(0, 1fr)",
+        minHeight: 0,
+      }}
+    >
+      <div className="panel-copy" style={{ marginBottom: "0.55rem" }}>
         <p className="eyebrow">Composition</p>
         <h2>Who owns the forest right now?</h2>
         <p>{livingTreeCount} living trees across four temperaments.</p>
       </div>
       <div
         style={{
-          display: "grid",
-          gap: "0.65rem",
-          marginBottom: "0.9rem",
-          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.55rem",
+          marginBottom: "0.7rem",
         }}
         aria-label="Treemap summary"
       >
         <article
           style={{
-            display: "grid",
-            gap: "0.25rem",
-            padding: "0.85rem 1rem",
-            borderRadius: "18px",
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            gap: "0.65rem",
+            flex: "1 1 140px",
+            minWidth: 0,
+            padding: "0.55rem 0.75rem",
+            borderRadius: "16px",
             background: "rgba(255, 248, 236, 0.08)",
             border: "1px solid rgba(255, 241, 223, 0.14)",
           }}
@@ -94,14 +108,18 @@ export function TreemapPanel({ livingTreeCount, shareByTemperament }: TreemapPan
           <span className="eyebrow" style={{ marginBottom: 0 }}>
             Living trees
           </span>
-          <strong>{livingTreeCount}</strong>
+          <strong style={{ fontVariantNumeric: "tabular-nums" }}>{livingTreeCount}</strong>
         </article>
         <article
           style={{
-            display: "grid",
-            gap: "0.25rem",
-            padding: "0.85rem 1rem",
-            borderRadius: "18px",
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            gap: "0.65rem",
+            flex: "1 1 140px",
+            minWidth: 0,
+            padding: "0.55rem 0.75rem",
+            borderRadius: "16px",
             background: "rgba(255, 248, 236, 0.08)",
             border: "1px solid rgba(255, 241, 223, 0.14)",
           }}
@@ -109,16 +127,20 @@ export function TreemapPanel({ livingTreeCount, shareByTemperament }: TreemapPan
           <span className="eyebrow" style={{ marginBottom: 0 }}>
             Dominant share
           </span>
-          <strong>
-            {TEMPERAMENT_SHORT_LABELS[dominant.temperament]} {Math.round(dominant.value * 100)}%
+          <strong style={{ fontVariantNumeric: "tabular-nums" }}>
+            {TEMPERAMENT_SHORT_LABELS[dominant.temperament]} {dominantShare}%
           </strong>
         </article>
         <article
           style={{
-            display: "grid",
-            gap: "0.25rem",
-            padding: "0.85rem 1rem",
-            borderRadius: "18px",
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            gap: "0.65rem",
+            flex: "1 1 140px",
+            minWidth: 0,
+            padding: "0.55rem 0.75rem",
+            borderRadius: "16px",
             background: "rgba(255, 248, 236, 0.08)",
             border: "1px solid rgba(255, 241, 223, 0.14)",
           }}
@@ -126,8 +148,8 @@ export function TreemapPanel({ livingTreeCount, shareByTemperament }: TreemapPan
           <span className="eyebrow" style={{ marginBottom: 0 }}>
             Next up
           </span>
-          <strong>
-            {TEMPERAMENT_SHORT_LABELS[runnerUp.temperament]} {Math.round(runnerUp.value * 100)}%
+          <strong style={{ fontVariantNumeric: "tabular-nums" }}>
+            {TEMPERAMENT_SHORT_LABELS[runnerUp.temperament]} {runnerUpShare}%
           </strong>
         </article>
       </div>
@@ -135,7 +157,11 @@ export function TreemapPanel({ livingTreeCount, shareByTemperament }: TreemapPan
         className="treemap-stage"
         role="img"
         aria-label="Temperament share treemap"
-        style={{ minHeight: "clamp(260px, 30vw, 360px)" }}
+        style={{
+          position: "relative",
+          minHeight: 0,
+          flex: "1 1 auto",
+        }}
       >
         {rectangles.map((rect) => {
           const count = Math.round(shareByTemperament[rect.temperament] * livingTreeCount);

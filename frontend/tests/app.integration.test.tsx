@@ -14,10 +14,30 @@ describe("Forest systems prototype app", () => {
     expect(screen.getByRole("slider", { name: "Wind" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Growth Advantage" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Mortality Pressure" })).toBeInTheDocument();
-    expect(screen.getByTestId("node-droughtStress")).toHaveTextContent("Drought Stress");
-    expect(screen.getByTestId("node-fireRisk")).toHaveTextContent("Fire Risk");
-    expect(screen.getByTestId("node-regrowthOpportunity")).toHaveTextContent("Regrowth Opportunity");
+    expect(screen.getByTestId("node-droughtStress")).toHaveTextContent("Drought stress");
+    expect(screen.getByTestId("node-fireRisk")).toHaveTextContent("Fire risk");
+    expect(screen.getByTestId("node-regrowthOpportunity")).toHaveTextContent("Regrowth opportunity");
     expect(screen.getByRole("img", { name: "Temperament share treemap" })).toBeInTheDocument();
+    expect(screen.queryByTestId("graph-node-droughtStress")).not.toBeInTheDocument();
+  });
+
+  it("opens and closes the full causal graph modal", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /open causal graph/i }));
+
+    const dialog = screen.getByRole("dialog", { name: /forest causal graph/i });
+    expect(within(dialog).getByTestId("graph-node-droughtStress")).toBeInTheDocument();
+    expect(within(dialog).getByTestId("graph-node-fireRisk")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: /forest causal graph/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /open causal graph/i }));
+    expect(screen.getByRole("dialog", { name: /forest causal graph/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /close graph/i }));
+    expect(screen.queryByRole("dialog", { name: /forest causal graph/i })).not.toBeInTheDocument();
   });
 
   it("updates node values live when a control changes", async () => {

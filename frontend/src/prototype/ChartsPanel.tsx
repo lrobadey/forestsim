@@ -103,7 +103,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
     },
   } as const;
   const active = trendMap[activeTrend];
-  const selectorOrder = (Object.keys(trendMap) as Array<keyof typeof trendMap>).filter((key) => key !== activeTrend);
+  const selectorOrder = Object.keys(trendMap) as Array<keyof typeof trendMap>;
 
   return (
     <section className="charts-panel panel" aria-label="Trend charts">
@@ -111,17 +111,16 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
         <p className="eyebrow">Trends</p>
         <h2>How the stand has been moving over time.</h2>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.85rem", alignItems: "stretch" }}>
+      <div style={{ display: "grid", gap: "0.7rem" }}>
         <article
           className="chart-card"
           style={{
-            flex: "1 1 420px",
             minWidth: 0,
-            padding: "0.95rem",
+            padding: "0.8rem",
             background: "rgba(255, 248, 236, 0.08)",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "0.8rem", alignItems: "baseline" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "baseline", marginBottom: "0.45rem" }}>
             <div className="chart-copy">
               <strong>{active.title}</strong>
               <span>{active.subtitle}</span>
@@ -129,19 +128,19 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
             <span
               style={{
                 flex: "0 0 auto",
-                padding: "0.35rem 0.65rem",
+                padding: "0.24rem 0.55rem",
                 borderRadius: "999px",
                 background: "rgba(255, 208, 134, 0.16)",
                 color: "var(--accent-strong)",
-                fontSize: "0.75rem",
-                letterSpacing: "0.06em",
+                fontSize: "0.7rem",
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
               }}
             >
               Primary
             </span>
           </div>
-          <svg viewBox="0 0 320 112" role="img" aria-label={active.ariaLabel} style={{ width: "100%", height: "auto" }}>
+          <svg viewBox="0 0 320 104" role="img" aria-label={active.ariaLabel} style={{ width: "100%", height: "auto" }}>
             {activeTrend === "temperament" ? (
               TEMPERAMENTS.map((temperament) => (
                 <polyline
@@ -149,16 +148,16 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
                   fill="none"
                   stroke={TEMPERAMENT_COLORS[temperament]}
                   strokeWidth="2.5"
-                  points={buildPolyline(points.map((point) => point.shareByTemperament[temperament]), 0, 1, 320, 112, 10, 12)}
+                  points={buildPolyline(points.map((point) => point.shareByTemperament[temperament]), 0, 1, 320, 104, 8, 10)}
                 />
               ))
             ) : (
-              <polyline fill="none" stroke={active.color} strokeWidth="3" points={buildPolyline(active.points, active.min, active.max, 320, 112, 10, 12)} />
+              <polyline fill="none" stroke={active.color} strokeWidth="3" points={buildPolyline(active.points, active.min, active.max, 320, 104, 8, 10)} />
             )}
-            <path d="M0 100 H320" className="chart-axis" />
+            <path d="M0 92 H320" className="chart-axis" />
           </svg>
           <div style={{ display: "grid", gap: "0.5rem", marginTop: "0.35rem" }}>
-            <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.4 }}>{active.description}</p>
+            <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.35 }}>{active.description}</p>
             {active.hasLegend ? (
               <div className="chart-legend">
                 {TEMPERAMENTS.map((temperament) => (
@@ -171,31 +170,42 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
             ) : null}
           </div>
         </article>
-        <div style={{ flex: "0 1 280px", minWidth: 0, display: "grid", gap: "0.65rem" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.45rem",
+            alignItems: "stretch",
+          }}
+        >
           {selectorOrder.map((trendKey) => {
             const trend = trendMap[trendKey];
+            const isActive = activeTrend === trendKey;
             return (
               <button
                 key={trendKey}
                 type="button"
                 onClick={() => setActiveTrend(trendKey)}
-                aria-pressed={activeTrend === trendKey}
+                aria-pressed={isActive}
                 style={{
-                  width: "100%",
+                  flex: "1 1 150px",
+                  minWidth: 0,
                   textAlign: "left",
-                  padding: "0.8rem",
-                  borderRadius: "20px",
-                  background: activeTrend === trendKey ? "rgba(255, 249, 239, 0.14)" : "rgba(255, 248, 236, 0.06)",
-                  border: activeTrend === trendKey ? "1px solid rgba(255, 213, 146, 0.42)" : "1px solid rgba(255, 241, 223, 0.14)",
+                  padding: "0.55rem 0.65rem",
+                  borderRadius: "16px",
+                  background: isActive ? "rgba(255, 249, 239, 0.14)" : "rgba(255, 248, 236, 0.06)",
+                  border: isActive ? "1px solid rgba(255, 213, 146, 0.42)" : "1px solid rgba(255, 241, 223, 0.14)",
                   color: "inherit",
+                  display: "grid",
+                  gap: "0.4rem",
                 }}
               >
-                <div className="chart-copy" style={{ marginBottom: "0.55rem" }}>
+                <div className="chart-copy" style={{ gap: "0.18rem" }}>
                   <strong>{trend.title}</strong>
                   <span>{trend.subtitle}</span>
                 </div>
-                <svg viewBox="0 0 180 44" aria-hidden="true" focusable="false" style={{ width: "100%", height: "auto" }}>
-                  <path d="M0 38 H180" className="chart-axis" />
+                <svg viewBox="0 0 180 40" aria-hidden="true" focusable="false" style={{ width: "100%", height: "auto" }}>
+                  <path d="M0 34 H180" className="chart-axis" />
                   {renderTrendPreview(trendKey, points, trend.color)}
                 </svg>
               </button>

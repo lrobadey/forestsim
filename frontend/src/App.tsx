@@ -16,20 +16,17 @@ export function App() {
 
   return (
     <div className="prototype-shell">
-      <header className="hero">
-        <div className="hero-copy">
+      <header className="top-bar">
+        <div className="top-bar-copy">
           {/* TODO: This app currently renders the abstract stand prototype,
           not the Python landscape engine. Keep the wording aligned with that
           scope until backend-driven runs are calibrated and promoted to the
           primary experience. */}
           <p className="eyebrow">Forest Systems Prototype</p>
           <h1>Build the smallest simulator that makes succession legible.</h1>
-          <p className="hero-summary">
-            Four controls, four temperaments, one stand, and a visible causal chain from system pressure to changing composition.
-          </p>
         </div>
-        <div className="hero-rail">
-          <div className="hero-metrics">
+        <div className="top-bar-rail">
+          <div className="top-bar-metrics">
             <div className="metric-pill">
               <span>Year</span>
               <strong>{model.state.year}</strong>
@@ -42,7 +39,17 @@ export function App() {
               {model.statusText}
             </div>
           </div>
-          <div className="hero-actions" aria-label="Playback controls">
+          <div className="top-bar-actions" aria-label="Playback controls">
+            <label className="speed-select">
+              <span>Simulation speed</span>
+              <select aria-label="Simulation speed" value={model.state.speed} onChange={(event) => model.setSpeed(event.target.value as (typeof SPEED_OPTIONS)[number])}>
+                {SPEED_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="playback-group">
               <button type="button" onClick={model.play}>
                 Play
@@ -54,28 +61,18 @@ export function App() {
                 Reset
               </button>
             </div>
-            <label className="speed-select">
-              <span>Simulation speed</span>
-              <select aria-label="Simulation speed" value={model.state.speed} onChange={(event) => model.setSpeed(event.target.value as (typeof SPEED_OPTIONS)[number])}>
-                {SPEED_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
         </div>
       </header>
 
-      <main className="prototype-grid">
+      <main className="dashboard-body">
+        <ControlsPanel controls={model.state.controls} onChange={model.setControl} />
         <TreemapPanel livingTreeCount={model.state.derived.livingTreeCount} shareByTemperament={model.state.derived.shareByTemperament} />
-        <NodeGraphPanel controls={model.state.controls} derived={model.state.derived} />
+        <div className="dashboard-rail">
+          <NodeGraphPanel controls={model.state.controls} derived={model.state.derived} />
+          <ChartsPanel history={model.state.history} />
+        </div>
       </main>
-
-      <ControlsPanel controls={model.state.controls} onChange={model.setControl} />
-
-      <ChartsPanel history={model.state.history} />
     </div>
   );
 }

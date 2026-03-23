@@ -44,29 +44,57 @@ export function ControlsPanel({ controls, onChange }: ControlsPanelProps) {
         <p className="eyebrow">Controls</p>
         <h2>Change the forces, then watch the stand answer back.</h2>
       </div>
-      <div className="control-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
+      <div
+        className="control-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          alignItems: "stretch",
+        }}
+      >
         {CONTROL_COPY.map((control) => (
           <article
             className="control-card"
             key={control.key}
             style={{
-              gap: "0.6rem",
-              padding: "0.9rem",
+              display: "grid",
+              gridTemplateRows: "auto auto 1fr",
+              gap: "0.4rem",
+              minHeight: "8.3rem",
+              padding: "0.8rem 0.85rem",
               background: "rgba(255, 248, 236, 0.06)",
             }}
           >
-            <div className="control-head" style={{ alignItems: "baseline" }}>
+            <div
+              className="control-head"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.65rem",
+                alignItems: "baseline",
+              }}
+            >
               <div style={{ minWidth: 0 }}>
                 <strong id={`${control.key}-label`} style={{ display: "block", lineHeight: 1.1 }}>
                   {control.title}
                 </strong>
-                <p style={{ marginTop: "0.2rem" }}>{control.meaning}</p>
+                <p style={{ marginTop: "0.18rem", lineHeight: 1.35 }}>{control.meaning}</p>
               </div>
-              <span aria-hidden="true" style={{ flex: "0 0 auto" }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  flex: "0 0 auto",
+                  padding: "0.3rem 0.5rem",
+                  borderRadius: "999px",
+                  background: "rgba(255, 208, 134, 0.16)",
+                  color: "var(--accent-strong)",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
                 {controls[control.key].toFixed(2)}
               </span>
             </div>
             <input
+              style={{ alignSelf: "end" }}
               id={`${control.key}-control`}
               type="range"
               min={0}
@@ -77,12 +105,7 @@ export function ControlsPanel({ controls, onChange }: ControlsPanelProps) {
               value={controls[control.key]}
               onChange={(event) => onChange(control.key, Number(event.target.value))}
             />
-            <details style={{ marginTop: "0.1rem" }}>
-              <summary style={{ cursor: "pointer", color: "var(--muted)", listStyle: "none" }}>
-                What it changes
-              </summary>
-              <small style={{ display: "block", marginTop: "0.5rem", lineHeight: 1.45, color: "var(--muted)" }}>{control.effect}</small>
-            </details>
+            <small style={{ alignSelf: "start", lineHeight: 1.35, color: "var(--muted)" }}>{control.effect}</small>
           </article>
         ))}
       </div>

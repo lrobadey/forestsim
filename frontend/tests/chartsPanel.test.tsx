@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ChartsPanel } from "../src/prototype/ChartsPanel";
 import { TEMPERAMENT_COLORS } from "../src/prototype/types";
 import type { ForestHistoryPoint } from "../src/prototype/types";
@@ -33,8 +34,12 @@ const history: ForestHistoryPoint[] = [
 ];
 
 describe("ChartsPanel", () => {
-  it("shows all temperament series colors in the selector preview", () => {
+  it("keeps the preview colors and legend behavior aligned with the active trend", async () => {
+    const user = userEvent.setup();
     const { container } = render(<ChartsPanel history={history} />);
+
+    expect(screen.getByRole("img", { name: "Living tree count trend" })).toBeInTheDocument();
+    expect(screen.queryByText("Large Gambler")).not.toBeInTheDocument();
 
     const button = screen.getByRole("button", { name: /share by temperament/i });
     const preview = button.querySelector("svg");
@@ -50,5 +55,13 @@ describe("ChartsPanel", () => {
       TEMPERAMENT_COLORS.small_struggler,
     ]);
     expect(container.querySelectorAll("svg polyline").length).toBeGreaterThanOrEqual(5);
+
+    await user.click(button);
+
+    expect(screen.getByRole("img", { name: "Share by temperament trend" })).toBeInTheDocument();
+    expect(screen.getByText("Large Gambler")).toBeInTheDocument();
+    expect(screen.getByText("Small Gambler")).toBeInTheDocument();
+    expect(screen.getByText("Large Struggler")).toBeInTheDocument();
+    expect(screen.getByText("Small Struggler")).toBeInTheDocument();
   });
 });
