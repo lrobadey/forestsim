@@ -34,19 +34,19 @@ const history: ForestHistoryPoint[] = [
 ];
 
 describe("ChartsPanel", () => {
-  it("keeps the preview colors and legend behavior aligned with the active trend", async () => {
+  it("switches to the composition trend and shows the temperament legend", async () => {
     const user = userEvent.setup();
-    const { container } = render(<ChartsPanel history={history} />);
+    render(<ChartsPanel history={history} />);
 
-    expect(screen.getByRole("img", { name: "Living tree count trend" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Living trees trend" })).toBeInTheDocument();
     expect(screen.queryByText("Large Gambler")).not.toBeInTheDocument();
 
-    const button = screen.getByRole("button", { name: /share by temperament/i });
-    const preview = button.querySelector("svg");
+    const button = screen.getByRole("button", { name: /composition by temperament/i });
 
-    expect(preview).not.toBeNull();
+    await user.click(button);
 
-    const strokes = Array.from(preview!.querySelectorAll("polyline")).map((line) => line.getAttribute("stroke"));
+    const chart = screen.getByRole("img", { name: "Composition by temperament trend" });
+    const strokes = Array.from(chart.querySelectorAll("polyline")).map((line) => line.getAttribute("stroke"));
 
     expect(strokes).toEqual([
       TEMPERAMENT_COLORS.large_gambler,
@@ -54,11 +54,6 @@ describe("ChartsPanel", () => {
       TEMPERAMENT_COLORS.large_struggler,
       TEMPERAMENT_COLORS.small_struggler,
     ]);
-    expect(container.querySelectorAll("svg polyline").length).toBeGreaterThanOrEqual(5);
-
-    await user.click(button);
-
-    expect(screen.getByRole("img", { name: "Share by temperament trend" })).toBeInTheDocument();
     expect(screen.getByText("Large Gambler")).toBeInTheDocument();
     expect(screen.getByText("Small Gambler")).toBeInTheDocument();
     expect(screen.getByText("Large Struggler")).toBeInTheDocument();

@@ -1128,25 +1128,25 @@ export function dominantStatusText(state: ForestPrototypeState): string {
     {
       label: "heat",
       value: state.derived.fireRisk + state.derived.droughtStress,
-      sentence: "Heat is amplifying drought stress and fire risk.",
+      sentence: "Current driver: heat is amplifying drought stress and fire risk.",
     },
     {
       label: "wind",
       value: state.controls.wind + state.derived.disturbanceFrequency * 0.7,
-      sentence: "Wind pressure is driving structural failure and openings.",
+      sentence: "Current driver: wind pressure is driving structural failure and openings.",
     },
     {
       label: "turnover",
       value: state.derived.turnoverRate + state.controls.mortalityPressure * 0.6,
-      sentence: "Baseline turnover is creating replacement pressure.",
+      sentence: "Current driver: baseline turnover is creating replacement pressure.",
     },
     {
       label: "release",
       value: state.derived.regrowthOpportunity + state.controls.growthAdvantage * 0.35,
-      sentence: "Regrowth opportunity is rewarding opportunistic temperaments.",
+      sentence: "Current driver: regrowth opportunity is rewarding opportunistic temperaments.",
     },
   ];
 
   metrics.sort((left, right) => right.value - left.value);
-  return metrics[0]?.sentence ?? "The stand is in a relatively steady state.";
+  return metrics[0]?.sentence ?? "Current driver: the stand is relatively steady.";
 }

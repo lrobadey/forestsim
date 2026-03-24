@@ -53,7 +53,7 @@ describe("Forest systems prototype app", () => {
   it("renders the prototype dashboard with controls and required graph nodes", async () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: /Build the smallest simulator/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /See succession through one stand/i })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Heat" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Wind" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Growth Advantage" })).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe("Forest systems prototype app", () => {
     ];
 
     const total = treemapBlocks.reduce((sum, block) => sum + Number(block.getAttribute("data-count")), 0);
-    expect(within(screen.getByLabelText("Composition treemap")).getByText(/living trees across four temperaments/i)).toHaveTextContent(`${total} living trees`);
+    expect(within(screen.getByLabelText("Composition treemap")).getByText(/living trees\./i)).toHaveTextContent(`${total} living trees`);
   });
 
   it("keeps temperament colors tied to temperament identity even when shares reorder", () => {

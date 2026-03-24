@@ -218,19 +218,19 @@ export function NodeGraphPanel({ controls, derived }: NodeGraphPanelProps) {
       id: "droughtStress",
       label: "Drought stress",
       value: derived.droughtStress.toFixed(2),
-      note: derived.droughtStress > 0.7 ? "High moisture pressure" : "Tracking moisture pressure",
+      note: derived.droughtStress > 0.7 ? "Moisture stress is high" : "Moisture stress is moderate",
     },
     {
       id: "fireRisk",
       label: "Fire risk",
       value: derived.fireRisk.toFixed(2),
-      note: derived.fireRisk > 0.7 ? "Elevated disturbance risk" : "Low to moderate disturbance risk",
+      note: derived.fireRisk > 0.7 ? "Disturbance risk is elevated" : "Disturbance risk is limited",
     },
     {
       id: "regrowthOpportunity",
       label: "Regrowth opportunity",
       value: derived.regrowthOpportunity.toFixed(2),
-      note: derived.regrowthOpportunity > 0.7 ? "Strong replacement window" : "Replacement window is tighter",
+      note: derived.regrowthOpportunity > 0.7 ? "Openings favor recruitment" : "Few openings favor recruitment",
     },
   ];
 
@@ -239,7 +239,7 @@ export function NodeGraphPanel({ controls, derived }: NodeGraphPanelProps) {
       <div className="panel-copy panel-copy-split">
         <div className="panel-copy-stack">
           <p className="eyebrow">Signals</p>
-          <h2>What is acting on the forest right now?</h2>
+          <h2>What is shaping the stand now?</h2>
         </div>
         <button
           type="button"
@@ -249,7 +249,7 @@ export function NodeGraphPanel({ controls, derived }: NodeGraphPanelProps) {
           aria-controls="forest-causal-graph-modal"
           onClick={() => setExpanded(true)}
         >
-          Graph
+          View graph
         </button>
       </div>
       <div className="signal-grid" aria-label="Causal graph highlights">

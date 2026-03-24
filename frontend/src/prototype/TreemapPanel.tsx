@@ -28,25 +28,25 @@ const SIZE_CLASS_META: Record<
   large_canopy: {
     short: "LC",
     label: "Large Canopy",
-    hint: "Upper canopy hold",
+    hint: "Upper canopy",
     level: 4,
   },
   canopy_candidate: {
     short: "CC",
     label: "Canopy Candidate",
-    hint: "Ready to break upward",
+    hint: "Near canopy",
     level: 3,
   },
   juvenile: {
     short: "JV",
     label: "Juvenile",
-    hint: "Understory growth",
+    hint: "Understory",
     level: 2,
   },
   seedling: {
     short: "SD",
     label: "Seedling",
-    hint: "Newest recruits",
+    hint: "New recruits",
     level: 1,
   },
 };
@@ -188,8 +188,8 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
     >
       <div className="panel-copy" style={{ marginBottom: "0.55rem" }}>
         <p className="eyebrow">Composition</p>
-        <h2>Who owns the forest right now?</h2>
-        <p>{livingTreeCount} living trees across four temperaments.</p>
+        <h2>Current stand composition</h2>
+        <p>{livingTreeCount} living trees. Outer blocks are temperaments; inner blocks are size classes.</p>
       </div>
       <div
         className="treemap-summary"
@@ -209,7 +209,7 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
         </article>
         <article className="treemap-summary-pill">
           <span className="eyebrow" style={{ marginBottom: 0 }}>
-            Dominant share
+            Largest share
           </span>
           <strong style={{ fontVariantNumeric: "tabular-nums" }}>
             {TEMPERAMENT_SHORT_LABELS[dominant]} {percentage(temperamentCounts[dominant], livingTreeCount)}%
@@ -217,14 +217,14 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
         </article>
         <article className="treemap-summary-pill">
           <span className="eyebrow" style={{ marginBottom: 0 }}>
-            Next up
+            Second share
           </span>
           <strong style={{ fontVariantNumeric: "tabular-nums" }}>
             {TEMPERAMENT_SHORT_LABELS[runnerUp]} {percentage(temperamentCounts[runnerUp], livingTreeCount)}%
           </strong>
         </article>
       </div>
-      <div className="treemap-key" aria-label="Tree size legend">
+      <div className="treemap-key" aria-label="Size classes">
         {SIZE_CLASS_ORDER.map((sizeClass) => (
           <article key={sizeClass} className="treemap-key-item">
             <div className="treemap-key-flag">

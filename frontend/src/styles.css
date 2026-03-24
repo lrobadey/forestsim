@@ -112,8 +112,8 @@ select {
 
 .top-bar h1 {
   font-size: clamp(1.5rem, 2.8vw, 2.3rem);
-  line-height: 0.95;
-  max-width: 14ch;
+  line-height: 0.96;
+  max-width: 11ch;
 }
 
 .eyebrow {
@@ -129,6 +129,13 @@ select {
 .chart-copy {
   display: grid;
   gap: 0.22rem;
+}
+
+.top-bar-summary {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .panel {
@@ -227,7 +234,15 @@ select {
 
 .controls-panel,
 .charts-panel {
-  background: linear-gradient(180deg, rgba(44, 35, 24, 0.94), rgba(31, 25, 18, 0.9));
+  background: linear-gradient(180deg, rgba(40, 32, 23, 0.9), rgba(28, 23, 18, 0.88));
+}
+
+.node-panel {
+  background: linear-gradient(180deg, rgba(38, 31, 23, 0.9), rgba(27, 23, 18, 0.88));
+}
+
+.treemap-panel {
+  background: linear-gradient(180deg, rgba(36, 31, 23, 0.95), rgba(30, 26, 21, 0.92));
 }
 
 .control-grid {
@@ -241,8 +256,8 @@ select {
   gap: 0.5rem;
   padding: 0.8rem;
   border-radius: 18px;
-  background: rgba(255, 248, 236, 0.08);
-  border: 1px solid rgba(255, 241, 223, 0.14);
+  background: rgba(255, 248, 236, 0.05);
+  border: 1px solid rgba(255, 241, 223, 0.12);
 }
 
 .control-head {
@@ -393,8 +408,8 @@ select {
   min-width: 0;
   padding: 0.46rem 0.68rem;
   border-radius: 16px;
-  background: rgba(255, 248, 236, 0.08);
-  border: 1px solid rgba(255, 241, 223, 0.14);
+  background: rgba(255, 248, 236, 0.05);
+  border: 1px solid rgba(255, 241, 223, 0.1);
 }
 
 .treemap-key {
@@ -412,8 +427,8 @@ select {
   min-width: 0;
   padding: 0.5rem 0.6rem;
   border-radius: 16px;
-  background: rgba(255, 248, 236, 0.06);
-  border: 1px solid rgba(255, 241, 223, 0.12);
+  background: rgba(255, 248, 236, 0.04);
+  border: 1px solid rgba(255, 241, 223, 0.1);
 }
 
 .treemap-key-flag {
@@ -510,8 +525,8 @@ select {
   gap: 0.24rem;
   padding: 0.56rem 0.66rem;
   border-radius: 16px;
-  background: rgba(255, 248, 236, 0.08);
-  border: 1px solid rgba(255, 241, 223, 0.14);
+  background: rgba(255, 248, 236, 0.05);
+  border: 1px solid rgba(255, 241, 223, 0.12);
 }
 
 .signal-card-head {
@@ -613,8 +628,8 @@ select {
   gap: 0.7rem;
   padding: 0.8rem;
   border-radius: 18px;
-  background: rgba(255, 248, 236, 0.08);
-  border: 1px solid rgba(255, 241, 223, 0.14);
+  background: rgba(255, 248, 236, 0.05);
+  border: 1px solid rgba(255, 241, 223, 0.12);
 }
 
 .chart-copy strong {
@@ -629,7 +644,7 @@ select {
 .chart-card-primary {
   min-width: 0;
   padding: 0.72rem;
-  background: rgba(255, 248, 236, 0.08);
+  background: rgba(255, 248, 236, 0.04);
 }
 
 .chart-card-head {
@@ -677,8 +692,8 @@ select {
   text-align: left;
   padding: 0.48rem 0.56rem;
   border-radius: 16px;
-  background: rgba(255, 248, 236, 0.06);
-  border: 1px solid rgba(255, 241, 223, 0.14);
+  background: rgba(255, 248, 236, 0.04);
+  border: 1px solid rgba(255, 241, 223, 0.12);
   color: inherit;
   display: flex;
   align-items: baseline;
@@ -856,7 +871,7 @@ select {
 
 @media (min-width: 1320px) {
   .dashboard-body {
-    grid-template-columns: clamp(280px, 22vw, 360px) minmax(0, 1.45fr) clamp(280px, 20vw, 360px);
+    grid-template-columns: clamp(260px, 21vw, 330px) minmax(0, 1.65fr) clamp(260px, 19vw, 320px);
     align-items: start;
   }
 

@@ -23,7 +23,8 @@ export function App() {
           scope until backend-driven runs are calibrated and promoted to the
           primary experience. */}
           <p className="eyebrow">Forest Systems Prototype</p>
-          <h1>Build the smallest simulator that makes succession legible.</h1>
+          <h1>See succession through one stand.</h1>
+          <p className="top-bar-summary">Set the forces, read the stand, then use the right rail to see what changed.</p>
         </div>
         <div className="top-bar-rail">
           <div className="top-bar-metrics">
@@ -32,7 +33,7 @@ export function App() {
               <strong>{model.state.year}</strong>
             </div>
             <div className="metric-pill">
-              <span>Dominant role</span>
+              <span>Dominant temperament</span>
               <strong>{dominantTemperament}</strong>
             </div>
             <div className="status-pill" aria-live="polite">

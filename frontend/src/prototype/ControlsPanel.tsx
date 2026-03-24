@@ -13,22 +13,22 @@ const CONTROL_COPY: Array<{
   {
     key: "heat",
     title: "Heat",
-    summary: "Climate burden, drought pressure, and fire likelihood.",
+    summary: "Raises drought stress and fire pressure.",
   },
   {
     key: "wind",
     title: "Wind",
-    summary: "Structural disturbance pressure and canopy failure risk.",
+    summary: "Raises canopy failure and structural disturbance.",
   },
   {
     key: "growthAdvantage",
     title: "Growth Advantage",
-    summary: "How hard opportunists convert good conditions into size gain.",
+    summary: "Helps opportunists turn good years into size gain.",
   },
   {
     key: "mortalityPressure",
     title: "Mortality Pressure",
-    summary: "Baseline turnover, death rates, and replacement opportunity.",
+    summary: "Raises background death and replacement.",
   },
 ];
 
@@ -37,8 +37,8 @@ export function ControlsPanel({ controls, onChange }: ControlsPanelProps) {
     <section className="controls-panel panel" aria-label="Controls panel">
       <div className="panel-copy">
         <p className="eyebrow">Controls</p>
-        <h2>Change the forces, then watch the stand answer back.</h2>
-        <p>Four sliders steer heat, wind, growth advantage, and baseline turnover.</p>
+        <h2>Set the four forces.</h2>
+        <p>Move a slider, then read the response in composition, signals, and history.</p>
       </div>
       <div className="control-grid">
         {CONTROL_COPY.map((control) => (

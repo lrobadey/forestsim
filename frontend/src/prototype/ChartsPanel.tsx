@@ -33,51 +33,47 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
   const disturbanceRates = points.map((point) => point.disturbanceFrequency);
   const trendMap = {
     living: {
-      title: "Living tree count",
+      title: "Living trees",
       shortLabel: "Living trees",
-      subtitle: "Population trend",
-      description: "The clearest single signal for stand trajectory.",
+      subtitle: "Current stand size",
       color: "#f2a33a",
       points: livingCounts,
       min: Math.min(...livingCounts, 0),
       max: Math.max(...livingCounts, 1),
-      ariaLabel: "Living tree count trend",
+      ariaLabel: "Living trees trend",
       hasLegend: false,
     },
     temperament: {
-      title: "Share by temperament",
-      shortLabel: "Temperaments",
-      subtitle: "Living-tree share",
-      description: "The composition split behind the count.",
+      title: "Composition by temperament",
+      shortLabel: "Composition",
+      subtitle: "Share of living trees",
       color: "#97d8bf",
       points: points.map((point) => Math.max(...TEMPERAMENTS.map((temperament) => point.shareByTemperament[temperament]))),
       min: 0,
       max: 1,
-      ariaLabel: "Share by temperament trend",
+      ariaLabel: "Composition by temperament trend",
       hasLegend: true,
     },
     turnover: {
-      title: "Turnover rate",
+      title: "Turnover",
       shortLabel: "Turnover",
       subtitle: "Deaths plus recruits",
-      description: "Replacement pressure over the recent window.",
       color: "#d8f2d9",
       points: turnoverRates,
       min: 0,
       max: 1,
-      ariaLabel: "Turnover rate trend",
+      ariaLabel: "Turnover trend",
       hasLegend: false,
     },
     disturbance: {
-      title: "Disturbance frequency",
+      title: "Disturbance",
       shortLabel: "Disturbance",
-      subtitle: "Recent fire and gap activity",
-      description: "How often the stand is being jolted.",
+      subtitle: "Recent canopy loss",
       color: "#97d8bf",
       points: disturbanceRates,
       min: 0,
       max: 1,
-      ariaLabel: "Disturbance frequency trend",
+      ariaLabel: "Disturbance trend",
       hasLegend: false,
     },
   } as const;
@@ -88,8 +84,9 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
   return (
     <section className="charts-panel panel" aria-label="Trend charts">
       <div className="panel-copy">
-        <p className="eyebrow">Trends</p>
-        <h2>How the stand has been moving over time.</h2>
+        <p className="eyebrow">History</p>
+        <h2>Recent stand trajectory</h2>
+        <p>Switch metrics to compare count, composition, turnover, and disturbance.</p>
       </div>
       <div className="charts-panel-body">
         <article className="chart-card chart-card-primary">
@@ -138,6 +135,7 @@ export function ChartsPanel({ history }: ChartsPanelProps) {
                 key={trendKey}
                 type="button"
                 onClick={() => setActiveTrend(trendKey)}
+                aria-label={`${trend.title} ${formatMetric(trendKey, trend.points.at(-1) ?? 0)}`}
                 aria-pressed={isActive}
                 className={isActive ? "trend-toggle trend-toggle-active" : "trend-toggle"}
               >
