@@ -81,10 +81,10 @@ select {
 .prototype-shell {
   display: grid;
   gap: var(--shell-gap);
-  width: min(100%, 1520px);
-  min-height: 100%;
+  width: 100%;
+  min-height: 100svh;
   margin: 0 auto;
-  padding: clamp(0.75rem, 1.5vw, 1rem);
+  padding: clamp(0.75rem, 1.5vw, 1.2rem);
 }
 
 .top-bar,
@@ -305,7 +305,41 @@ select {
   min-height: 260px;
   border-radius: 20px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 249, 239, 0.04), rgba(255, 249, 239, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 249, 239, 0.04), rgba(255, 249, 239, 0.1)),
+    linear-gradient(90deg, transparent 49.6%, rgba(255, 243, 224, 0.08) 50%, transparent 50.4%),
+    linear-gradient(180deg, transparent 49.6%, rgba(255, 243, 224, 0.08) 50%, transparent 50.4%);
+}
+
+.treemap-seam {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition:
+    left 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.treemap-seam-vertical {
+  width: 1.1rem;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 234, 0), rgba(255, 247, 234, 0.82) 20%, rgba(255, 247, 234, 0.82) 80%, rgba(255, 247, 234, 0)),
+    linear-gradient(90deg, rgba(255, 247, 234, 0), rgba(255, 225, 176, 0.38) 50%, rgba(255, 247, 234, 0));
+  filter: blur(0.2px);
+  opacity: 0.72;
+}
+
+.treemap-seam-horizontal {
+  height: 1.1rem;
+  transform: translateY(-50%);
+  background:
+    linear-gradient(90deg, rgba(255, 247, 234, 0), rgba(255, 247, 234, 0.82) 20%, rgba(255, 247, 234, 0.82) 80%, rgba(255, 247, 234, 0)),
+    linear-gradient(180deg, rgba(255, 247, 234, 0), rgba(255, 225, 176, 0.38) 50%, rgba(255, 247, 234, 0));
+  filter: blur(0.2px);
+  opacity: 0.72;
 }
 
 .treemap-block {
@@ -315,10 +349,10 @@ select {
   border-radius: 18px;
   box-shadow: inset 0 1px 0 rgba(255, 252, 244, 0.1);
   transition:
-    left 220ms ease-out,
-    top 220ms ease-out,
-    width 220ms ease-out,
-    height 220ms ease-out;
+    left 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 340ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .treemap-block-inner {
@@ -361,6 +395,88 @@ select {
   border-radius: 16px;
   background: rgba(255, 248, 236, 0.08);
   border: 1px solid rgba(255, 241, 223, 0.14);
+}
+
+.treemap-key {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.treemap-key-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border-radius: 16px;
+  background: rgba(255, 248, 236, 0.06);
+  border: 1px solid rgba(255, 241, 223, 0.12);
+}
+
+.treemap-key-flag {
+  display: grid;
+  gap: 0.22rem;
+  justify-items: start;
+  padding: 0.38rem 0.45rem 0.32rem;
+  border-radius: 12px;
+  background: rgba(15, 13, 11, 0.34);
+  border: 1px solid rgba(255, 247, 234, 0.14);
+}
+
+.treemap-key-copy {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.treemap-key-copy span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.treemap-key-copy small {
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.treemap-stage-marker {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: end;
+  gap: 0.16rem;
+  height: 0.95rem;
+}
+
+.treemap-stage-marker i {
+  display: block;
+  width: 0.26rem;
+  border-radius: 999px;
+  background: rgba(255, 241, 223, 0.22);
+}
+
+.treemap-stage-marker i:nth-child(1) {
+  height: 0.28rem;
+}
+
+.treemap-stage-marker i:nth-child(2) {
+  height: 0.46rem;
+}
+
+.treemap-stage-marker i:nth-child(3) {
+  height: 0.68rem;
+}
+
+.treemap-stage-marker i:nth-child(4) {
+  height: 0.9rem;
+}
+
+.treemap-stage-marker i.is-active {
+  background: rgba(255, 219, 154, 0.96);
+  box-shadow: 0 0 12px rgba(255, 199, 114, 0.24);
 }
 
 .panel-copy-split {
@@ -428,20 +544,44 @@ select {
 .treemap-cell {
   position: absolute;
   display: grid;
-  align-content: end;
-  gap: 0.16rem;
+  align-content: space-between;
+  gap: 0.35rem;
   padding: 0.55rem;
   border: 1px solid rgba(255, 247, 234, 0.22);
   overflow: hidden;
   transition:
-    left 220ms ease-out,
-    top 220ms ease-out,
-    width 220ms ease-out,
-    height 220ms ease-out;
+    left 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.treemap-cell-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.treemap-cell-badge {
+  display: inline-grid;
+  gap: 0.18rem;
+  justify-items: start;
+  min-width: 0;
+  padding: 0.28rem 0.34rem 0.26rem;
+  border-radius: 10px;
+  background: rgba(15, 13, 11, 0.26);
+  border: 1px solid rgba(255, 247, 234, 0.12);
+}
+
+.treemap-cell small {
+  color: rgba(255, 244, 230, 0.74);
+  line-height: 1.25;
 }
 
 .treemap-cell span,
-.treemap-cell strong {
+.treemap-cell strong,
+.treemap-cell small {
   position: relative;
   z-index: 1;
 }
@@ -606,33 +746,24 @@ select {
   }
 }
 
-@media (min-width: 1180px) and (min-height: 700px) {
-  html,
-  body,
-  #root {
-    overflow: hidden;
+@media (min-width: 900px) {
+  .dashboard-body {
+    grid-template-columns: clamp(280px, 28vw, 380px) minmax(0, 1fr);
+    align-items: start;
   }
 
-  body {
-    min-height: 100svh;
+  .dashboard-rail {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
   }
 
-  .prototype-shell {
-    height: 100svh;
-    overflow: hidden;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0.65rem;
-    padding: 0.7rem;
+  .panel {
+    padding: 0.82rem;
   }
 
   .top-bar {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.45fr);
-    padding: 0.8rem 0.9rem;
-  }
-
-  .top-bar h1 {
-    font-size: clamp(1.3rem, 1.65vw, 1.8rem);
-    max-width: 18ch;
+    grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 1.2fr);
   }
 
   .top-bar-rail {
@@ -642,10 +773,6 @@ select {
 
   .top-bar-metrics {
     justify-content: flex-end;
-  }
-
-  .top-bar-actions {
-    padding: 0.58rem 0.68rem;
   }
 
   .top-bar-actions,
@@ -659,28 +786,6 @@ select {
   .metric-pill,
   .status-pill {
     padding: 0.5rem 0.7rem;
-  }
-
-  .dashboard-body {
-    grid-template-columns: 320px minmax(0, 1fr) 320px;
-    min-height: 0;
-    align-items: stretch;
-  }
-
-  .dashboard-body > * ,
-  .dashboard-rail > * {
-    min-height: 0;
-  }
-
-  .dashboard-rail {
-    grid-template-rows: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    min-height: 0;
-  }
-
-  .panel {
-    min-height: 0;
-    padding: 0.78rem;
-    overflow: hidden;
   }
 
   .panel-copy {
@@ -698,11 +803,6 @@ select {
     font-size: 0.9rem;
   }
 
-  .controls-panel {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-
   .control-grid {
     align-content: start;
   }
@@ -712,13 +812,8 @@ select {
     padding: 0.72rem 0.75rem;
   }
 
-  .signal-grid {
-    gap: 0.48rem;
-  }
-
   .treemap-stage {
-    min-height: 0;
-    height: 100%;
+    min-height: clamp(360px, 42vw, 620px);
   }
 
   .treemap-summary {
@@ -746,31 +841,33 @@ select {
     padding: 0.45rem;
   }
 
-  .node-panel {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    align-content: start;
-  }
-
-  .chart-card {
-    min-height: 0;
+  .signal-grid {
+    gap: 0.48rem;
   }
 
   .charts-panel-body {
     gap: 0.55rem;
   }
 
-  .charts-panel {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-
   .trend-toggle-grid {
     gap: 0.38rem;
   }
+}
 
-  .node-graph {
-    min-height: 0;
+@media (min-width: 1320px) {
+  .dashboard-body {
+    grid-template-columns: clamp(280px, 22vw, 360px) minmax(0, 1.45fr) clamp(280px, 20vw, 360px);
+    align-items: start;
+  }
+
+  .dashboard-rail {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .top-bar h1 {
+    font-size: clamp(1.35rem, 1.7vw, 2rem);
+    max-width: 18ch;
   }
 }
 

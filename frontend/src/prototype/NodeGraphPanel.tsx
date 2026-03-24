@@ -241,7 +241,14 @@ export function NodeGraphPanel({ controls, derived }: NodeGraphPanelProps) {
           <p className="eyebrow">Signals</p>
           <h2>What is acting on the forest right now?</h2>
         </div>
-        <button type="button" className="panel-inline-button" aria-expanded={expanded} aria-controls="forest-causal-graph-modal" onClick={() => setExpanded(true)}>
+        <button
+          type="button"
+          className="panel-inline-button"
+          aria-label="Open causal graph"
+          aria-expanded={expanded}
+          aria-controls="forest-causal-graph-modal"
+          onClick={() => setExpanded(true)}
+        >
           Graph
         </button>
       </div>

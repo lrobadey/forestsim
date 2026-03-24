@@ -34,6 +34,7 @@ export type PlaybackSpeed = (typeof SPEED_OPTIONS)[number];
 export type SizeClass = "seedling" | "juvenile" | "canopy_candidate" | "large_canopy";
 export type CanopyRole = "canopy" | "subcanopy" | "suppressed";
 export type ReproductiveState = "immature" | "maturing" | "active";
+export type GapSource = "canopy_loss" | "fire";
 
 export type TemperamentRecord = Record<Temperament, number>;
 
@@ -52,6 +53,16 @@ export interface ForestTree {
   reproductiveState: ReproductiveState;
   disturbanceDamage: number;
   suppressionYears: number;
+}
+
+export interface ForestGap {
+  id: number;
+  x: number;
+  y: number;
+  radius: number;
+  age: number;
+  intensity: number;
+  source: GapSource;
 }
 
 export interface ForestControls {
@@ -90,11 +101,13 @@ export interface ForestPrototypeState {
   seed: number;
   year: number;
   trees: ForestTree[];
+  gaps: ForestGap[];
   controls: ForestControls;
   derived: ForestDerivedState;
   history: ForestHistoryPoint[];
   rngState: number;
   nextTreeId: number;
+  nextGapId: number;
   isPlaying: boolean;
   speed: PlaybackSpeed;
 }

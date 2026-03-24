@@ -1,6 +1,5 @@
-import { useRef } from "react";
 import { TEMPERAMENT_COLORS, TEMPERAMENT_LABELS, TEMPERAMENT_SHORT_LABELS, TEMPERAMENTS } from "./types";
-import type { ForestTree, SizeClass, Temperament, TemperamentRecord } from "./types";
+import type { ForestTree, SizeClass, Temperament } from "./types";
 
 interface TreemapPanelProps {
   trees: ForestTree[];
@@ -17,11 +16,39 @@ interface Rect<Key extends string> {
 
 const SIZE_CLASS_ORDER: SizeClass[] = ["large_canopy", "canopy_candidate", "juvenile", "seedling"];
 
-const SIZE_CLASS_SHORT_LABELS: Record<SizeClass, string> = {
-  large_canopy: "LC",
-  canopy_candidate: "CC",
-  juvenile: "JV",
-  seedling: "SD",
+const SIZE_CLASS_META: Record<
+  SizeClass,
+  {
+    short: string;
+    label: string;
+    hint: string;
+    level: number;
+  }
+> = {
+  large_canopy: {
+    short: "LC",
+    label: "Large Canopy",
+    hint: "Upper canopy hold",
+    level: 4,
+  },
+  canopy_candidate: {
+    short: "CC",
+    label: "Canopy Candidate",
+    hint: "Ready to break upward",
+    level: 3,
+  },
+  juvenile: {
+    short: "JV",
+    label: "Juvenile",
+    hint: "Understory growth",
+    level: 2,
+  },
+  seedling: {
+    short: "SD",
+    label: "Seedling",
+    hint: "Newest recruits",
+    level: 1,
+  },
 };
 
 const SIZE_CLASS_TAILS: Record<SizeClass, string> = {
@@ -32,6 +59,13 @@ const SIZE_CLASS_TAILS: Record<SizeClass, string> = {
 };
 
 type Orientation = "vertical" | "horizontal";
+
+const CORNER_LAYOUT: readonly [Temperament, Temperament, Temperament, Temperament] = [
+  "large_gambler",
+  "small_gambler",
+  "large_struggler",
+  "small_struggler",
+];
 
 function buildStripLayout<Key extends string>(
   entries: Array<{ id: Key; value: number }>,
@@ -87,32 +121,43 @@ function countByTemperamentAndSize(trees: ForestTree[]): Record<Temperament, Rec
   return counts;
 }
 
-function stabilizeTemperamentOrder(previous: Temperament[], shares: TemperamentRecord, minLead = 0.035): Temperament[] {
-  const next = [...previous];
-  let moved = true;
-
-  while (moved) {
-    moved = false;
-    for (let index = 1; index < next.length; index += 1) {
-      const current = next[index];
-      const ahead = next[index - 1];
-      if (shares[current] > shares[ahead] + minLead) {
-        next[index - 1] = current;
-        next[index] = ahead;
-        moved = true;
-      }
-    }
-  }
-
-  return next;
-}
-
 function percentage(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
 }
 
 function childBackground(color: string, sizeClass: SizeClass): string {
   return `linear-gradient(165deg, ${color}, ${SIZE_CLASS_TAILS[sizeClass]})`;
+}
+
+function buildCornerLayout(counts: Record<Temperament, number>): Rect<Temperament>[] {
+  const [topLeft, topRight, bottomLeft, bottomRight] = CORNER_LAYOUT;
+  const total = Math.max(
+    counts[topLeft] + counts[topRight] + counts[bottomLeft] + counts[bottomRight],
+    0.001,
+  );
+  const leftTotal = counts[topLeft] + counts[bottomLeft];
+  const rightTotal = counts[topRight] + counts[bottomRight];
+  const leftWidth = Math.max(18, Math.min(82, (leftTotal / total) * 100));
+  const rightWidth = 100 - leftWidth;
+  const leftTopHeight = leftTotal > 0 ? (counts[topLeft] / leftTotal) * 100 : 50;
+  const rightTopHeight = rightTotal > 0 ? (counts[topRight] / rightTotal) * 100 : 50;
+
+  return [
+    { id: topLeft, x: 0, y: 0, width: leftWidth, height: leftTopHeight, value: counts[topLeft] },
+    { id: topRight, x: leftWidth, y: 0, width: rightWidth, height: rightTopHeight, value: counts[topRight] },
+    { id: bottomLeft, x: 0, y: leftTopHeight, width: leftWidth, height: 100 - leftTopHeight, value: counts[bottomLeft] },
+    { id: bottomRight, x: leftWidth, y: rightTopHeight, width: rightWidth, height: 100 - rightTopHeight, value: counts[bottomRight] },
+  ];
+}
+
+function StageMarker({ level }: { level: number }) {
+  return (
+    <span className="treemap-stage-marker" aria-hidden="true">
+      {Array.from({ length: 4 }, (_, index) => (
+        <i key={index} className={index < level ? "is-active" : undefined} />
+      ))}
+    </span>
+  );
 }
 
 export function TreemapPanel({ trees }: TreemapPanelProps) {
@@ -125,29 +170,10 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
       SIZE_CLASS_ORDER.reduce((sum, sizeClass) => sum + byTemperamentAndSize[temperament][sizeClass], 0),
     ]),
   ) as Record<Temperament, number>;
-  const shareByTemperament = Object.fromEntries(
-    TEMPERAMENTS.map((temperament) => [temperament, livingTreeCount > 0 ? temperamentCounts[temperament] / livingTreeCount : 0]),
-  ) as TemperamentRecord;
-
-  const temperamentOrderRef = useRef<Temperament[] | null>(null);
-  if (temperamentOrderRef.current === null) {
-    temperamentOrderRef.current = [...TEMPERAMENTS].sort((left, right) => shareByTemperament[right] - shareByTemperament[left]);
-  } else {
-    temperamentOrderRef.current = stabilizeTemperamentOrder(temperamentOrderRef.current, shareByTemperament);
-  }
-
-  const orderedTemperaments = temperamentOrderRef.current;
-  const temperamentRects = buildStripLayout(
-    orderedTemperaments.map((temperament) => ({
-      id: temperament,
-      value: Math.max(temperamentCounts[temperament], 0.001),
-    })),
-    0,
-    0,
-    100,
-    100,
-    "vertical",
-  );
+  const temperamentRects = buildCornerLayout(temperamentCounts);
+  const rectMap = new Map(temperamentRects.map((rect) => [rect.id, rect]));
+  const topLeftRect = rectMap.get("large_gambler");
+  const topRightRect = rectMap.get("small_gambler");
 
   const [dominant, runnerUp] = [...TEMPERAMENTS].sort((left, right) => temperamentCounts[right] - temperamentCounts[left]);
 
@@ -157,14 +183,13 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
       aria-label="Composition treemap"
       style={{
         display: "grid",
-        gridTemplateRows: "auto auto minmax(0, 1fr)",
-        minHeight: 0,
+        gap: 0,
       }}
     >
       <div className="panel-copy" style={{ marginBottom: "0.55rem" }}>
         <p className="eyebrow">Composition</p>
         <h2>Who owns the forest right now?</h2>
-        <p>{livingTreeCount} living trees split across four temperament groups.</p>
+        <p>{livingTreeCount} living trees across four temperaments.</p>
       </div>
       <div
         className="treemap-summary"
@@ -199,16 +224,59 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
           </strong>
         </article>
       </div>
+      <div className="treemap-key" aria-label="Tree size legend">
+        {SIZE_CLASS_ORDER.map((sizeClass) => (
+          <article key={sizeClass} className="treemap-key-item">
+            <div className="treemap-key-flag">
+              <StageMarker level={SIZE_CLASS_META[sizeClass].level} />
+              <strong>{SIZE_CLASS_META[sizeClass].short}</strong>
+            </div>
+            <div className="treemap-key-copy">
+              <span>{SIZE_CLASS_META[sizeClass].label}</span>
+              <small>{SIZE_CLASS_META[sizeClass].hint}</small>
+            </div>
+          </article>
+        ))}
+      </div>
       <div
         className="treemap-stage"
         role="img"
         aria-label="Temperament share treemap"
         style={{
           position: "relative",
-          minHeight: 0,
-          flex: "1 1 auto",
         }}
       >
+        {topLeftRect && topRightRect ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="treemap-seam treemap-seam-vertical"
+              style={{
+                left: `${topLeftRect.width}%`,
+                top: 0,
+                height: "100%",
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="treemap-seam treemap-seam-horizontal"
+              style={{
+                left: 0,
+                top: `${topLeftRect.height}%`,
+                width: `${topLeftRect.width}%`,
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="treemap-seam treemap-seam-horizontal"
+              style={{
+                left: `${topRightRect.x}%`,
+                top: `${topRightRect.height}%`,
+                width: `${topRightRect.width}%`,
+              }}
+            />
+          </>
+        ) : null}
         {temperamentRects.map((rect) => {
           const count = temperamentCounts[rect.id];
           const temperamentShare = percentage(count, livingTreeCount);
@@ -250,15 +318,20 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
               <div className="treemap-block-inner">
                 {childRects.map((childRect) => {
                   const childCount = byTemperamentAndSize[rect.id][childRect.id];
-                  const showChildCopy = childRect.width * childRect.height > 240;
-                  const showChildValue = childRect.width * childRect.height > 420;
+                  const sizeMeta = SIZE_CLASS_META[childRect.id];
+                  const area = childRect.width * childRect.height;
+                  const showLabel = area > 150;
+                  const showLongLabel = area > 300;
+                  const showHint = area > 520;
+                  const showChildValue = area > 250;
 
                   return (
                     <div
                       key={`${rect.id}-${childRect.id}`}
                       className="treemap-cell"
                       data-testid={`treemap-cell-${rect.id}-${childRect.id}`}
-                      title={`${TEMPERAMENT_LABELS[rect.id]} ${SIZE_CLASS_SHORT_LABELS[childRect.id]} ${childCount} trees`}
+                      aria-label={`${TEMPERAMENT_LABELS[rect.id]} ${sizeMeta.label} ${childCount} trees`}
+                      title={`${TEMPERAMENT_LABELS[rect.id]} ${sizeMeta.label} ${childCount} trees`}
                       style={{
                         left: `${childRect.x}%`,
                         top: `${childRect.y}%`,
@@ -267,8 +340,14 @@ export function TreemapPanel({ trees }: TreemapPanelProps) {
                         background: childBackground(TEMPERAMENT_COLORS[rect.id], childRect.id),
                       }}
                     >
-                      {showChildCopy ? <span>{SIZE_CLASS_SHORT_LABELS[childRect.id]}</span> : null}
-                      {showChildValue ? <strong>{childCount}</strong> : null}
+                      <div className="treemap-cell-head">
+                        <div className="treemap-cell-badge">
+                          <StageMarker level={sizeMeta.level} />
+                          {showLabel ? <span>{showLongLabel ? sizeMeta.label : sizeMeta.short}</span> : null}
+                        </div>
+                        {showChildValue ? <strong>{childCount}</strong> : null}
+                      </div>
+                      {showHint ? <small>{sizeMeta.hint}</small> : null}
                     </div>
                   );
                 })}

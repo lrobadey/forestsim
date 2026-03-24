@@ -20,9 +20,8 @@ import {
   randomChance,
   roleWeight,
   seedInitialTrees,
-  zeroDerivedState,
 } from "./seed";
-import type { ForestControls, ForestDerivedState, ForestPrototypeState, ForestTree, Temperament, TemperamentRecord } from "./types";
+import type { ForestControls, ForestDerivedState, ForestGap, ForestPrototypeState, ForestTree, Temperament, TemperamentRecord } from "./types";
 import { SPEED_OPTIONS, TEMPERAMENTS } from "./types";
 
 interface TemperamentParams {
@@ -38,6 +37,7 @@ interface TemperamentParams {
 interface ProjectionSignals {
   gapFraction: number;
   recentDisturbancePulse: number;
+  gaps: ForestGap[];
 }
 
 interface ProjectedStand {
@@ -79,6 +79,11 @@ interface StandPoint {
   x: number;
   y: number;
 }
+
+const GAP_SAMPLE_AXIS = 24;
+const GAP_OPENNESS_THRESHOLD = 0.3;
+const GAP_MAX_AGE = 8;
+const GAP_MIN_INTENSITY = 0.12;
 
 const TEMPERAMENT_PARAMS: Record<Temperament, TemperamentParams> = {
   large_gambler: {
@@ -190,6 +195,102 @@ function computeCanopyClosure(trees: ForestTree[]): number {
   return clamp(closure);
 }
 
+export function gapOpennessAtPoint(point: StandPoint, gaps: ForestGap[]): number {
+  let openness = 0;
+
+  for (const gap of gaps) {
+    if (gap.radius <= 0 || gap.intensity <= 0) {
+      continue;
+    }
+    const distance = Math.sqrt(squaredDistance(point, gap));
+    if (distance >= gap.radius) {
+      continue;
+    }
+    const candidate = gap.intensity * (1 - distance / gap.radius) ** 2;
+    if (candidate > openness) {
+      openness = candidate;
+    }
+  }
+
+  return clamp(openness);
+}
+
+export function estimateGapFraction(gaps: ForestGap[]): number {
+  let openSamples = 0;
+  const totalSamples = GAP_SAMPLE_AXIS * GAP_SAMPLE_AXIS;
+
+  for (let row = 0; row < GAP_SAMPLE_AXIS; row += 1) {
+    for (let col = 0; col < GAP_SAMPLE_AXIS; col += 1) {
+      const point = {
+        x: (col + 0.5) / GAP_SAMPLE_AXIS,
+        y: (row + 0.5) / GAP_SAMPLE_AXIS,
+      };
+      if (gapOpennessAtPoint(point, gaps) >= GAP_OPENNESS_THRESHOLD) {
+        openSamples += 1;
+      }
+    }
+  }
+
+  return openSamples / totalSamples;
+}
+
+export function advanceForestGaps(gaps: ForestGap[]): ForestGap[] {
+  return gaps
+    .map((gap) => ({
+      ...gap,
+      age: gap.age + 1,
+      intensity: clamp(gap.intensity * 0.84),
+    }))
+    .filter((gap) => gap.age <= GAP_MAX_AGE && gap.intensity >= GAP_MIN_INTENSITY);
+}
+
+function mergeTwoGaps(left: ForestGap, right: ForestGap): ForestGap {
+  const leftWeight = left.radius * left.intensity;
+  const rightWeight = right.radius * right.intensity;
+  const weightTotal = Math.max(leftWeight + rightWeight, 1e-6);
+
+  return {
+    id: Math.min(left.id, right.id),
+    x: clamp((left.x * leftWeight + right.x * rightWeight) / weightTotal, 0.03, 0.97),
+    y: clamp((left.y * leftWeight + right.y * rightWeight) / weightTotal, 0.03, 0.97),
+    radius: clamp(Math.max(left.radius, right.radius) + 0.25 * Math.min(left.radius, right.radius), 0.08, 0.16),
+    age: Math.min(left.age, right.age),
+    intensity: Math.max(left.intensity, right.intensity),
+    source: left.source === "fire" || right.source === "fire" ? "fire" : "canopy_loss",
+  };
+}
+
+export function mergeForestGaps(gaps: ForestGap[]): ForestGap[] {
+  const merged: ForestGap[] = [];
+
+  for (const gap of gaps) {
+    let nextGap = { ...gap };
+    let mergeIndex = merged.findIndex((existing) => Math.sqrt(squaredDistance(existing, nextGap)) < 0.5 * (existing.radius + nextGap.radius));
+
+    while (mergeIndex >= 0) {
+      nextGap = mergeTwoGaps(merged[mergeIndex], nextGap);
+      merged.splice(mergeIndex, 1);
+      mergeIndex = merged.findIndex((existing) => Math.sqrt(squaredDistance(existing, nextGap)) < 0.5 * (existing.radius + nextGap.radius));
+    }
+
+    merged.push(nextGap);
+  }
+
+  return merged.sort((left, right) => left.id - right.id);
+}
+
+function createGapFromTreeLoss(tree: ForestTree, fireDamage: number, directWindFailure: boolean, gapId: number): ForestGap {
+  return {
+    id: gapId,
+    x: tree.x,
+    y: tree.y,
+    radius: clamp(0.07 + tree.size * 0.05, 0.08, 0.12),
+    age: 0,
+    intensity: clamp(Math.min(1, 0.75 + 0.15 * fireDamage + (directWindFailure ? 0.1 : 0))),
+    source: fireDamage > 0 ? "fire" : "canopy_loss",
+  };
+}
+
 function assignCanopyRoles(trees: ForestTree[]): Map<number, ForestTree["canopyRole"]> {
   const sortedIds = [...trees]
     .sort((left, right) => right.size - left.size || right.age - left.age || left.id - right.id)
@@ -213,12 +314,25 @@ function assignCanopyRoles(trees: ForestTree[]): Map<number, ForestTree["canopyR
   return roleMap;
 }
 
-function refreshTreeStructure(trees: ForestTree[]): { trees: ForestTree[]; canopyClosure: number; meanVigor: number } {
+function refreshTreeStructure(trees: ForestTree[], gaps: ForestGap[]): {
+  trees: ForestTree[];
+  canopyClosure: number;
+  meanVigor: number;
+  gapExposureById: Map<number, number>;
+} {
   const canopyClosure = computeCanopyClosure(trees);
   const roleMap = assignCanopyRoles(trees);
+  const gapExposureById = new Map<number, number>();
   const refreshed = trees.map((tree) => {
     const canopyRole = roleMap.get(tree.id) ?? "suppressed";
-    const suppressionLevel = clamp(canopyClosure * shadeSensitivity(tree.temperament) * roleWeight(canopyRole));
+    const localGapExposure = gapOpennessAtPoint(tree, gaps);
+    const suppressionLevel = clamp(
+      canopyClosure *
+        shadeSensitivity(tree.temperament) *
+        roleWeight(canopyRole) *
+        Math.max(0.35, 1 - 0.55 * localGapExposure),
+    );
+    gapExposureById.set(tree.id, localGapExposure);
 
     return {
       ...tree,
@@ -234,6 +348,7 @@ function refreshTreeStructure(trees: ForestTree[]): { trees: ForestTree[]; canop
     trees: refreshed,
     canopyClosure,
     meanVigor: mean(refreshed.map((tree) => tree.vigor)),
+    gapExposureById,
   };
 }
 
@@ -245,7 +360,13 @@ function applyGrowthAdvantage(temperament: Temperament, growth: number, controls
   return Math.max(0, growth * (1 - 0.55 * delta));
 }
 
-function estimateGrowthPotential(tree: ForestTree, controls: ForestControls, droughtStress: number, regrowthOpportunity: number): number {
+function estimateGrowthPotential(
+  tree: ForestTree,
+  controls: ForestControls,
+  droughtStress: number,
+  regrowthOpportunity: number,
+  localGapExposure: number,
+): number {
   const params = TEMPERAMENT_PARAMS[tree.temperament];
   const heatLoad = intensifiedControl(controls.heat);
   let growth =
@@ -258,6 +379,11 @@ function estimateGrowthPotential(tree: ForestTree, controls: ForestControls, dro
 
   if (regrowthOpportunity > 0.42) {
     growth *= 1 + params.openingBonus * (regrowthOpportunity - 0.42) * 1.15;
+  }
+
+  if (localGapExposure > 0) {
+    const releaseScalar = tree.canopyRole === "canopy" ? 0.2 : 0.45;
+    growth *= 1 + params.openingBonus * localGapExposure * releaseScalar;
   }
 
   return Math.max(0, growth);
@@ -287,8 +413,8 @@ function estimateMortalityRisk(tree: ForestTree, controls: ForestControls, droug
   return clamp(risk, 0, 0.95);
 }
 
-function projectStand(trees: ForestTree[], controls: ForestControls, signals: ProjectionSignals): ProjectedStand {
-  const structural = refreshTreeStructure(trees);
+export function projectStand(trees: ForestTree[], controls: ForestControls, signals: ProjectionSignals): ProjectedStand {
+  const structural = refreshTreeStructure(trees, signals.gaps);
   const heatLoad = intensifiedControl(controls.heat);
   const mortalityLoad = intensifiedControl(controls.mortalityPressure);
   const standing = structural.trees;
@@ -314,7 +440,8 @@ function projectStand(trees: ForestTree[], controls: ForestControls, signals: Pr
   const counts = standingCountByTemperament(standing);
 
   for (const tree of standing) {
-    growthTotals[tree.temperament] += estimateGrowthPotential(tree, controls, droughtStress, regrowthOpportunity);
+    const localGapExposure = structural.gapExposureById.get(tree.id) ?? 0;
+    growthTotals[tree.temperament] += estimateGrowthPotential(tree, controls, droughtStress, regrowthOpportunity, localGapExposure);
     mortalityTotals[tree.temperament] += estimateMortalityRisk(tree, controls, droughtStress, tree.disturbanceDamage, tree.suppressionYears);
   }
 
@@ -638,20 +765,26 @@ export function simulateTreefallCascade(
 
 export function createForestPrototypeState(seed = DEFAULT_SEED): ForestPrototypeState {
   const seeded = seedInitialTrees(seed);
+  const gaps: ForestGap[] = [];
   const projection = projectStand(seeded.trees, DEFAULT_CONTROLS, {
-    gapFraction: INITIAL_GAP_FRACTION,
+    gapFraction: estimateGapFraction(gaps),
     recentDisturbancePulse: INITIAL_RECENT_DISTURBANCE,
+    gaps,
   });
-  const derived = buildDerivedState(projection);
+  const derived = buildDerivedState(projection, {
+    gapFraction: estimateGapFraction(gaps),
+  });
   const baseState: ForestPrototypeState = {
     seed,
     year: DEFAULT_YEAR,
     trees: projection.trees,
+    gaps,
     controls: { ...DEFAULT_CONTROLS },
     derived,
     history: [],
     rngState: seeded.rngState,
     nextTreeId: seeded.nextTreeId,
+    nextGapId: 1,
     isPlaying: false,
     speed: SPEED_OPTIONS[1],
   };
@@ -663,14 +796,16 @@ export function createForestPrototypeState(seed = DEFAULT_SEED): ForestPrototype
 }
 
 export function recomputeForestState(state: ForestPrototypeState, nextControls = state.controls): ForestPrototypeState {
+  const gapFraction = estimateGapFraction(state.gaps);
   const projection = projectStand(state.trees, nextControls, {
-    gapFraction: state.derived.gapFraction,
+    gapFraction,
     recentDisturbancePulse: state.derived.recentDisturbancePulse,
+    gaps: state.gaps,
   });
   const derived = buildDerivedState(projection, {
     turnoverRate: state.derived.turnoverRate,
     disturbanceFrequency: state.derived.disturbanceFrequency,
-    gapFraction: state.derived.gapFraction,
+    gapFraction,
     recentDisturbancePulse: state.derived.recentDisturbancePulse,
   });
 
@@ -704,9 +839,12 @@ export function setPlaybackState(state: ForestPrototypeState, isPlaying: boolean
 
 export function stepForestState(state: ForestPrototypeState): ForestPrototypeState {
   const rng = createRng(state.rngState);
+  const activeGaps = advanceForestGaps(state.gaps);
+  const openingFraction = estimateGapFraction(activeGaps);
   const projection = projectStand(state.trees, state.controls, {
-    gapFraction: state.derived.gapFraction,
+    gapFraction: openingFraction,
     recentDisturbancePulse: state.derived.recentDisturbancePulse,
+    gaps: activeGaps,
   });
   const workingTrees = projection.trees.map((tree) => ({ ...tree }));
   const accumulators = createAccumulators();
@@ -727,14 +865,21 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
   const survivors: ForestTree[] = [];
   const activeCounts = emptyRecord();
   const candidates: StepCandidate[] = [];
-  const deadTreeAnchors: StandPoint[] = [];
+  const newGaps: ForestGap[] = [];
   let deadAnyThisYear = 0;
   let deadLargeThisYear = 0;
   let largeWindDeaths = 0;
   let gapPulse = 0;
 
   for (const tree of workingTrees) {
-    const growthPotential = estimateGrowthPotential(tree, state.controls, projection.droughtStress, projection.regrowthOpportunity);
+    const localGapExposure = gapOpennessAtPoint(tree, activeGaps);
+    const growthPotential = estimateGrowthPotential(
+      tree,
+      state.controls,
+      projection.droughtStress,
+      projection.regrowthOpportunity,
+      localGapExposure,
+    );
     const fireDamage = fireTargetIds.has(tree.id) ? randomBetween(rng, 0.42, 0.9) : 0;
     const nextVigor = clamp(
       tree.vigor +
@@ -827,10 +972,10 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
 
     if (died) {
       deadAnyThisYear += 1;
-      deadTreeAnchors.push({ x: candidate.sourceTree.x, y: candidate.sourceTree.y });
       if (isLarge(candidate.sourceTree.temperament)) {
         deadLargeThisYear += 1;
         gapPulse += 0.2;
+        newGaps.push(createGapFromTreeLoss(candidate.nextTree, candidate.fireDamage, candidate.directWindFailure, state.nextGapId + newGaps.length));
         if (candidate.directWindFailure || secondaryKilledIds.has(candidate.sourceTree.id)) {
           largeWindDeaths += 1;
         }
@@ -848,9 +993,8 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
   }
 
   const eventScale = Math.max(projection.livingTreeCount, BASELINE_TREE_COUNT) / BASELINE_TREE_COUNT;
-  const gapFraction = clamp(
-    (deadLargeThisYear / eventScale) * 0.055 + (deadAnyThisYear / eventScale) * 0.012 + state.derived.gapFraction * 0.42,
-  );
+  const gaps = mergeForestGaps([...activeGaps, ...newGaps]);
+  const gapFraction = estimateGapFraction(gaps);
   const recentDisturbancePulse = clamp(
     state.derived.recentDisturbancePulse * 0.28 +
       (fireOccurred ? 0.72 : 0) +
@@ -866,6 +1010,7 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
   const postProjection = projectStand(survivors, state.controls, {
     gapFraction,
     recentDisturbancePulse,
+    gaps,
   });
 
   const seedRain = emptyRecord();
@@ -906,7 +1051,8 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
 
     while (recruitCount > 0 && survivors.length + recruits.length < MAX_LIVING_TREES) {
       const occupied = [...survivors, ...recruits].map((tree) => ({ x: tree.x, y: tree.y }));
-      const recruitPosition = findRecruitPosition(occupied, rng.state, deadTreeAnchors);
+      const recruitAnchors = gaps.map(({ x, y }) => ({ x, y }));
+      const recruitPosition = findRecruitPosition(occupied, rng.state, recruitAnchors);
       rng.state = recruitPosition.nextRngState;
 
       recruits.push({
@@ -934,6 +1080,7 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
   const finalProjection = projectStand(finalTrees, state.controls, {
     gapFraction,
     recentDisturbancePulse,
+    gaps,
   });
   const growthRateByTemperament = finalizeRates(
     accumulators.growthTotals,
@@ -959,9 +1106,11 @@ export function stepForestState(state: ForestPrototypeState): ForestPrototypeSta
     ...state,
     year: state.year + 1,
     trees: finalProjection.trees,
+    gaps,
     derived,
     rngState: rng.state,
     nextTreeId,
+    nextGapId: state.nextGapId + newGaps.length,
   };
 
   return {
